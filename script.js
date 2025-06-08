@@ -3,15 +3,18 @@ let currentEditingProductId = null;
 let currentEditingCustomerId = null;
 let currentEditingSupplierId = null; // New variable for supplier ID
 let invoiceCustomersCache = [];
+let productsCache = [];
 
 /**
  * Opens a specific tab by adding the 'active' class to its content and corresponding sidebar button.
  * @param {string} tabName - The ID of the tab content to display (e.g., 'nhanvien', 'sanpham', 'khachhang', 'nhacungcap').
  */
-function openTab(tabName) {
+async function openTab(tabName) {
     // Hide all tab contents
-    const tabContents = document.querySelectorAll('.tab-content');
-    tabContents.forEach(content => content.classList.remove('active'));
+    const tabContents = document.getElementsByClassName('tab-content');
+    for (let content of tabContents) {
+        content.classList.remove('active');
+    }
 
     // Hide all forms when switching tabs
     document.querySelectorAll('.data-form').forEach(form => form.style.display = 'none');
@@ -21,10 +24,7 @@ function openTab(tabName) {
     currentEditingSupplierId = null; // Clear supplier editing ID
 
     // Show the selected tab content
-    const targetTab = document.getElementById(tabName);
-    if (targetTab) {
-        targetTab.classList.add('active');
-    }
+    document.getElementById(tabName).classList.add('active');
 
     // Update active state for sidebar buttons
     const sidebarButtons = document.querySelectorAll('.sidebar button');
@@ -43,8 +43,25 @@ function openTab(tabName) {
         fetchCustomers();
     } else if (tabName === 'nhacungcap') { // Fetch suppliers when 'nhacungcap' tab is opened
         fetchSuppliers();
+    } else if (tabName === 'hoadon') {
+        populateInvoiceDropdowns();
+        // Tự động sinh mã hóa đơn
+        const invoiceIdInput = document.getElementById('invoice-id');
+        if (invoiceIdInput) {
+            invoiceIdInput.value = await generateNextInvoiceId();
+        }
+        // Tự động set ngày hôm nay cho ngày lập
+        const invoiceDateInput = document.getElementById('invoice-date');
+        if (invoiceDateInput) {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            invoiceDateInput.value = `${yyyy}-${mm}-${dd}`;
+        }
+        await populateProductDropdown();
+        fetchInvoices();
     }
-    // No action needed for 'hoadon' as it is a placeholder
 }
 
 /**
@@ -837,44 +854,32 @@ function editProduct(button) {
  * Fetches product data from the API and populates the HTML table.
  */
 async function fetchProducts() {
-    console.log('Fetching all products from API...');
     try {
         const response = await fetch('https://btldbs-api.onrender.com/api/sanpham');
-        if (!response.ok) {
-            throw new Error('Lỗi mạng hoặc không tìm thấy tài nguyên');
-        }
         const data = await response.json();
-        console.log('Received product data for table update:', data);
+        productsCache = data;
         const productList = document.getElementById('product-list');
-        productList.innerHTML = ''; // Clear old data
+        productList.innerHTML = '';
 
         data.forEach(product => {
             const newRow = productList.insertRow();
-            const idCell = newRow.insertCell();
-            const nameCell = newRow.insertCell();
-            const unitCell = newRow.insertCell();
-            const quantityCell = newRow.insertCell();
-            const mfgDateCell = newRow.insertCell();
-            const expDateCell = newRow.insertCell();
-            const priceCell = newRow.insertCell();
+            newRow.insertCell().textContent = product.MaSanPham;
+            newRow.insertCell().textContent = product.TenSanPham;
+            newRow.insertCell().textContent = product.DonViTinh;
+            newRow.insertCell().textContent = product.SoLuong;
+            newRow.insertCell().textContent = product.NgaySanXuat;
+            newRow.insertCell().textContent = product.HanSuDung;
+            newRow.insertCell().textContent = product.GiaTien;
+            // Add action buttons if needed
             const actionsCell = newRow.insertCell();
             actionsCell.classList.add('action-buttons');
-
-            idCell.textContent = String(product.MaSanPham).padStart(6, '0'); // Format ID here
-            nameCell.textContent = product.TenSanPham;
-            unitCell.textContent = product.DonViTinh;
-            quantityCell.textContent = product.SoLuong;
-            mfgDateCell.textContent = formatDate(product.NgaySanXuat);
-            expDateCell.textContent = formatDate(product.HanSuDung);
-            priceCell.textContent = parseFloat(product.GiaTien).toLocaleString('vi-VN'); // Format currency for display
             actionsCell.innerHTML = `
                 <button class="edit-button" onclick="editProduct(this)">Sửa</button>
                 <button class="delete-button" onclick="deleteProduct(this)">Xóa</button>
             `;
         });
     } catch (error) {
-        console.error('Lỗi khi lấy dữ liệu sản phẩm từ API:', error);
-        alert('Không thể tải dữ liệu sản phẩm. Vui lòng thử lại sau.');
+        console.error('Error fetching products:', error);
     }
 }
 
@@ -1260,97 +1265,180 @@ async function populateInvoiceDropdowns() {
     } catch {}
 }
 
-// Gọi khi mở tab hóa đơn
-const oldOpenTab = openTab;
-openTab = async function(tabName) {
-    oldOpenTab(tabName);
-    if (tabName === 'hoadon') {
-        await populateInvoiceDropdowns();
-        // Tự động sinh mã hóa đơn
-        const invoiceIdInput = document.getElementById('invoice-id');
-        if (invoiceIdInput) {
-            invoiceIdInput.value = await generateNextInvoiceId();
-        }
-        // Tự động set ngày hôm nay cho ngày lập
-        const invoiceDateInput = document.getElementById('invoice-date');
-        if (invoiceDateInput) {
-            const today = new Date();
-            const yyyy = today.getFullYear();
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const dd = String(today.getDate()).padStart(2, '0');
-            invoiceDateInput.value = `${yyyy}-${mm}-${dd}`;
-        }
-        fetchInvoices();
+async function populateProductDropdown() {
+    try {
+        const response = await fetch('https://btldbs-api.onrender.com/api/sanpham');
+        productsCache = await response.json();
+
+        const productSelect = document.querySelector('.product-select');
+        productSelect.innerHTML = '<option value="">-- Chọn sản phẩm --</option>';
+
+        productsCache.forEach(product => {
+            const option = document.createElement('option');
+            option.value = product.MaSanPham;
+            option.textContent = `${product.MaSanPham} - ${product.TenSanPham}`;
+            productSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error fetching products:', error);
     }
-};
+}
 
+async function addChiTietHoaDonItem() {
+    const productSelect = document.querySelector('.product-select');
+    const quantityInput = document.querySelector('.quantity');
+    
+    const productId = parseInt(productSelect.value);
+    const quantity = parseInt(quantityInput.value);
+    
+    if (!productId || !quantity) {
+        alert('Vui lòng chọn sản phẩm và nhập số lượng!');
+        return;
+    }
+    
+    // Fetch products if cache is empty
+    if (productsCache.length === 0) {
+        await populateProductDropdown();
+    }
+    
+    const product = productsCache.find(p => p.MaSanPham === productId);
+    if (!product) {
+        alert('Không tìm thấy sản phẩm!');
+        return;
+    }
+    
+    // Check if product is already in the list
+    const existingRow = document.querySelector(`#added-items-list tr[data-product-id="${productId}"]`);
+    if (existingRow) {
+        alert('Sản phẩm này đã được thêm vào hóa đơn!');
+        return;
+    }
+    
+    const donGia = product.GiaTien;
+    const thanhTien = donGia * quantity;
+    
+    const newRow = document.createElement('tr');
+    newRow.dataset.productId = productId;
+    newRow.innerHTML = `
+        <td>${productId}</td>
+        <td>${product.TenSanPham}</td>
+        <td>${quantity}</td>
+        <td>${donGia.toLocaleString()}đ</td>
+        <td>${thanhTien.toLocaleString()}đ</td>
+        <td>
+            <button onclick="removeAddedItem(this)" class="remove-item">Xóa</button>
+        </td>
+    `;
+    
+    document.getElementById('added-items-list').appendChild(newRow);
+    calculateTotal();
+    
+    // Reset input fields
+    productSelect.value = '';
+    quantityInput.value = '1';
+}
 
-// Hàm lưu hóa đơn
+function removeAddedItem(button) {
+    const row = button.closest('tr');
+    row.remove();
+    calculateTotal();
+}
+
+function calculateTotal() {
+    const rows = document.querySelectorAll('#added-items-list tr');
+    let total = 0;
+    
+    rows.forEach(row => {
+        const thanhTien = parseFloat(row.cells[4].textContent.replace(/[^\d.-]/g, ''));
+        total += thanhTien;
+    });
+    
+    document.getElementById('total-amount').value = total;
+}
+
 async function saveInvoice() {
     const maDon = document.getElementById('invoice-id').value;
     const ngay = document.getElementById('invoice-date').value;
-    const phone = document.getElementById('invoice-customer-phone').value.trim();
+    const idKhachHang = document.getElementById('customer-info').dataset.id;
     const idNhanVien = document.getElementById('invoice-employee-id').value;
-    if (!maDon || !ngay || !phone) {
-        alert('Vui lòng nhập đầy đủ mã đơn, ngày và số điện thoại khách hàng!');
+    const tongTien = document.getElementById('total-amount').value;
+
+    if (!maDon || !ngay || !idKhachHang || !idNhanVien) {
+        alert('Vui lòng điền đầy đủ thông tin hóa đơn');
         return;
     }
 
-    // Tìm khách hàng theo SĐT
-    const found = invoiceCustomersCache.find(c => c.SoDienThoai === phone);
-    if (!found) {
-        alert('Không tìm thấy khách hàng với số điện thoại này!');
+    const addedItems = document.querySelectorAll('#added-items-list tr');
+    if (addedItems.length === 0) {
+        alert('Vui lòng thêm ít nhất một sản phẩm vào hóa đơn');
         return;
     }
-
-    const idKhachHang = found.IdKhachHang;
-    const dateObj = new Date(ngay);
-    const yyyy = dateObj.getFullYear();
-    const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
-    const dd = String(dateObj.getDate()).padStart(2, '0');
-    const ngayFormatted = `${yyyy}-${mm}-${dd}`;
-
-    const newInvoice = {
-        IdKhachHang: idKhachHang,
-        IdNhanVien: idNhanVien ? parseInt(idNhanVien) : 0,
-        MaDon: parseInt(maDon),
-        Ngay: ngayFormatted, // Định dạng YYYY-MM-DD hoặc GMT string tùy API
-        TongTien: parseInt("100000000")
-    };
 
     try {
-        const response = await fetch('https://btldbs-api.onrender.com/api/hoadon', {
+        // Save HoaDon
+        const hoadonResponse = await fetch('https://btldbs-api.onrender.com/api/hoadon', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(newInvoice)
+            body: JSON.stringify({
+                MaDon: parseInt(maDon),
+                Ngay: ngay,
+                TongTien: parseFloat(tongTien),
+                IdKhachHang: parseInt(idKhachHang),
+                IdNhanVien: parseInt(idNhanVien)
+            })
         });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Lỗi lưu hóa đơn: ${response.status} - ${errorText}`);
+        if (!hoadonResponse.ok) {
+            throw new Error('Failed to save hóa đơn');
         }
+
+        // Save ChiTietHoaDon items
+        for (const row of addedItems) {
+            const maSanPham = parseInt(row.dataset.productId);
+            const soLuong = parseInt(row.cells[2].textContent);
+            const donGia = parseFloat(row.cells[3].textContent.replace(/[^\d.-]/g, ''));
+
+            const chiTietResponse = await fetch('https://btldbs-api.onrender.com/api/chitiethoadon', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    MaDon: parseInt(maDon),
+                    MaSanPham: maSanPham,
+                    SoLuong: soLuong,
+                    DonGia: donGia
+                })
+            });
+
+            if (!chiTietResponse.ok) {
+                throw new Error('Failed to save chi tiết hóa đơn');
+            }
+        }
+
         alert('Lưu hóa đơn thành công!');
-        // Reset form nếu muốn
-        document.getElementById('invoice-customer-phone').value = '';
-        document.getElementById('customer-info').innerHTML = '';
-        // Sinh mã mới và ngày mới
-        const invoiceIdInput = document.getElementById('invoice-id');
-        if (invoiceIdInput) invoiceIdInput.value = await generateNextInvoiceId();
-        const invoiceDateInput = document.getElementById('invoice-date');
-        if (invoiceDateInput) {
-            const today = new Date();
-            const yyyy = today.getFullYear();
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const dd = String(today.getDate()).padStart(2, '0');
-            invoiceDateInput.value = `${yyyy}-${mm}-${dd}`;
-        }
+        await fetchInvoices();
+        resetInvoiceForm();
     } catch (error) {
-        console.error('Lỗi khi lưu hóa đơn:', error);
-        alert('Có lỗi xảy ra khi lưu hóa đơn.');
+        console.error('Error saving invoice:', error);
+        alert('Có lỗi xảy ra khi lưu hóa đơn');
     }
-    fetchInvoices(); // Cập nhật danh sách hóa đơn
+}
+
+async function resetInvoiceForm() {
+    document.getElementById('invoice-date').value = '';
+    document.getElementById('invoice-customer-phone').value = '';
+    document.getElementById('customer-info').innerHTML = '';
+    document.getElementById('customer-info').dataset.id = '';
+    document.getElementById('invoice-employee-id').value = '';
+    document.getElementById('total-amount').value = '';
+    document.getElementById('added-items-list').innerHTML = '';
+    const invoiceIdInput = document.getElementById('invoice-id');
+    if (invoiceIdInput) {
+        invoiceIdInput.value = await generateNextInvoiceId();
+    }
 }
 
 async function generateNextInvoiceId() {
@@ -1376,6 +1464,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const value = this.value.trim();
             if (!value) {
                 infoDiv.innerHTML = '';
+                infoDiv.dataset.id = '';
                 return;
             }
             const found = invoiceCustomersCache.find(c => c.SoDienThoai === value);
@@ -1386,8 +1475,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     Họ tên: ${found.HoTen}<br>
                     SĐT: ${found.SoDienThoai}
                 `;
+                infoDiv.dataset.id = found.IdKhachHang;
             } else {
                 infoDiv.innerHTML = '<span style="color:#d32f2f;">Không tìm thấy khách hàng</span>';
+                infoDiv.dataset.id = '';
             }
         });
     }
@@ -1408,6 +1499,11 @@ async function deleteInvoice(maDon) {
         }
         alert(`Đã xóa hóa đơn có mã ${String(maDon).padStart(6, '0')}!`);
         fetchInvoices();
+        // Update invoice-id input after deletion
+        const invoiceIdInput = document.getElementById('invoice-id');
+        if (invoiceIdInput) {
+            invoiceIdInput.value = await generateNextInvoiceId();
+        }
     } catch (error) {
         console.error('Lỗi khi xóa hóa đơn:', error);
         alert('Có lỗi xảy ra khi xóa hóa đơn.');
@@ -1429,10 +1525,62 @@ async function fetchInvoices() {
             row.insertCell().textContent = Number(inv.TongTien).toLocaleString('vi-VN');
             const actionsCell = row.insertCell();
             actionsCell.innerHTML = `
+                <button class="detail-button" onclick="showInvoiceDetail(${inv.MaDon})">Chi tiết</button>
                 <button class="delete-button" onclick="deleteInvoice(${inv.MaDon})">Xóa</button>
             `;
         });
     } catch (error) {
         alert('Không thể tải dữ liệu hóa đơn!');
+    }
+}
+
+// Modal functions for invoice detail
+function closeInvoiceDetailModal() {
+    document.getElementById('invoice-detail-modal').style.display = 'none';
+    document.getElementById('invoice-detail-content').innerHTML = '';
+}
+
+async function showInvoiceDetail(maDon) {
+    document.getElementById('invoice-detail-modal').style.display = 'block';
+    const contentDiv = document.getElementById('invoice-detail-content');
+    contentDiv.innerHTML = '<div style="text-align:center; color:#1976d2;">Đang tải chi tiết...</div>';
+    try {
+        let details = [];
+        try {
+            const res1 = await fetch(`https://btldbs-api.onrender.com/api/chitiethoadon/${maDon}`);
+            if (res1.ok) details = await res1.json();
+        } catch {}
+        if (!details || details.length === 0) {
+            try {
+                const res2 = await fetch(`https://btldbs-api.onrender.com/api/chitiethoadon?madon=${maDon}`);
+                if (res2.ok) details = await res2.json();
+            } catch {}
+        }
+        // Filter details by MaDon to ensure only the selected invoice's details are shown
+        details = details.filter(item => item.MaDon == maDon);
+
+        if (!details || details.length === 0) {
+            contentDiv.innerHTML = '<div style="color:#d32f2f;">Không có chi tiết hóa đơn.</div>';
+            return;
+        }
+        let html = `<table><thead><tr><th>Mã sản phẩm</th><th>Tên sản phẩm</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th></tr></thead><tbody>`;
+        for (const item of details) {
+            let tenSanPham = '';
+            if (productsCache && productsCache.length > 0) {
+                const prod = productsCache.find(p => p.MaSanPham === item.MaSanPham);
+                if (prod) tenSanPham = prod.TenSanPham;
+            }
+            html += `<tr>
+                <td>${item.MaSanPham}</td>
+                <td>${tenSanPham || ''}</td>
+                <td>${item.SoLuong}</td>
+                <td>${Number(item.DonGia).toLocaleString('vi-VN')}</td>
+                <td>${Number(item.SoLuong * item.DonGia).toLocaleString('vi-VN')}</td>
+            </tr>`;
+        }
+        html += '</tbody></table>';
+        contentDiv.innerHTML = html;
+    } catch (error) {
+        contentDiv.innerHTML = '<div style="color:#d32f2f;">Lỗi khi tải chi tiết hóa đơn.</div>';
     }
 }

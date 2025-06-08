@@ -275,6 +275,46 @@
                 </select>
                 <br>
                 <button class="add-button" onclick="saveInvoice()">Lưu hóa đơn</button>
+                
+                <div id="chitiethoadon-form" style="margin-top: 32px;">
+                    <h3>Chi tiết hóa đơn</h3>
+                    <div id="chitiethoadon-items">
+                        <div class="chitiethoadon-item">
+                            <label for="product-select">Chọn sản phẩm:</label>
+                            <select class="product-select" style="width: 300px;">
+                                <option value="">-- Chọn sản phẩm --</option>
+                            </select>
+                            
+                            <label for="quantity">Số lượng:</label>
+                            <input type="number" class="quantity" min="1" value="1">
+                            
+                            <button type="button" class="add-item" onclick="addChiTietHoaDonItem()">Thêm vào hóa đơn</button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 32px;">
+                        <h4>Danh sách sản phẩm đã thêm:</h4>
+                        <table id="added-items-table" style="width: 100%; margin-top: 16px;">
+                            <thead>
+                                <tr>
+                                    <th>Mã sản phẩm</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Số lượng</th>
+                                    <th>Đơn giá</th>
+                                    <th>Thành tiền</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="added-items-list">
+                            </tbody>
+                        </table>
+                        <div style="margin-top: 16px; text-align: right;">
+                            <label for="total-amount">Tổng tiền:</label>
+                            <input type="number" id="total-amount" readonly style="font-weight: bold;">
+                        </div>
+                    </div>
+                </div>
+
                 <table id="invoice-table" style="margin-top:32px; width:100%;">
                     <thead>
                         <tr>
@@ -293,5 +333,16 @@
     </div>
 
     <script src="script.js"></script>
+
+    <!-- Modal for invoice details -->
+    <div id="invoice-detail-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeInvoiceDetailModal()">&times;</span>
+            <h3>Chi tiết hóa đơn</h3>
+            <div id="invoice-detail-content">
+                <!-- Details will be loaded here -->
+            </div>
+        </div>
+    </div>
 </body>
 </html>
