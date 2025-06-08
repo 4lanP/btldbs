@@ -17,7 +17,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: flex-start; /* Align items to the left */
-    height: 100vh; /* Full height sidebar */
+    height: 1000vh; /* Full height sidebar */
 }
 
 .sidebar button {
