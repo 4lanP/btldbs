@@ -1593,22 +1593,30 @@ function closeInvoiceDetailModal() {
     document.getElementById('invoice-detail-content').innerHTML = '';
 }
 
+function closeInvoiceDetailModal() {
+    document.getElementById('invoice-detail-modal').style.display = 'none';
+    document.getElementById('invoice-detail-content').innerHTML = '';
+}
+
 async function showInvoiceDetail(maDon) {
     document.getElementById('invoice-detail-modal').style.display = 'block';
     const contentDiv = document.getElementById('invoice-detail-content');
     contentDiv.innerHTML = '<div style="text-align:center; color:#1976d2;">Đang tải chi tiết...</div>';
     try {
         const res = await fetch(`https://btldbs-api.onrender.com/api/chitiethoadon?madon=${maDon}`);
-        if (!res.ok) throw new Error('Failed to fetch invoice details');
-        let details = await res.json();
-        details = details.filter(item => item.MaDon == maDon);
+        if (!res.ok) {
+            throw new Error('Failed to fetch invoice details');
+        }
+        const details = await res.json();
+        // Filter details by MaDon to ensure only the selected invoice's details are shown
+        const filteredDetails = details.filter(item => item.MaDon == maDon);
 
-        if (!details || details.length === 0) {
+        if (!filteredDetails || filteredDetails.length === 0) {
             contentDiv.innerHTML = '<div style="color:#d32f2f;">Không có chi tiết hóa đơn.</div>';
             return;
         }
         let html = `<table><thead><tr><th>Mã sản phẩm</th><th>Tên sản phẩm</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th></tr></thead><tbody>`;
-        for (const item of details) {
+        for (const item of filteredDetails) {
             let tenSanPham = '';
             if (productsCache && productsCache.length > 0) {
                 const prod = productsCache.find(p => p.MaSanPham === item.MaSanPham);
