@@ -1586,18 +1586,9 @@ async function showInvoiceDetail(maDon) {
     const contentDiv = document.getElementById('invoice-detail-content');
     contentDiv.innerHTML = '<div style="text-align:center; color:#1976d2;">Đang tải chi tiết...</div>';
     try {
-        let details = [];
-        try {
-            const res1 = await fetch(`https://btldbs-api.onrender.com/api/chitiethoadon/${maDon}`);
-            if (res1.ok) details = await res1.json();
-        } catch {}
-        if (!details || details.length === 0) {
-            try {
-                const res2 = await fetch(`https://btldbs-api.onrender.com/api/chitiethoadon?madon=${maDon}`);
-                if (res2.ok) details = await res2.json();
-            } catch {}
-        }
-        // Filter details by MaDon to ensure only the selected invoice's details are shown
+        const res = await fetch(`https://btldbs-api.onrender.com/api/chitiethoadon?madon=${maDon}`);
+        if (!res.ok) throw new Error('Failed to fetch invoice details');
+        let details = await res.json();
         details = details.filter(item => item.MaDon == maDon);
 
         if (!details || details.length === 0) {
