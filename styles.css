@@ -481,3 +481,158 @@ tbody tr:nth-child(even) {
     margin-left: auto;
     display: block;
 }
+
+/* --- Nhập hàng (tab nhaphang) --- */
+#nhaphang label {
+    font-weight: 600;
+    color: #1976d2;
+    display: block;
+    margin-bottom: 6px;
+}
+#nhaphang input[type="text"],
+#nhaphang input[type="date"],
+#nhaphang input[type="number"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #b3c6e0;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-size: 16px;
+    transition: border 0.2s;
+    background: #f8fbff;
+    color: #222;
+    box-sizing: border-box;
+}
+#nhaphang input[type="text"]:focus,
+#nhaphang input[type="date"]:focus,
+#nhaphang input[type="number"]:focus {
+    border: 1.5px solid #1976d2;
+    outline: none;
+}
+#nhaphang select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #b3c6e0;
+    border-radius: 6px;
+    font-size: 16px;
+    margin-bottom: 16px;
+    background: #f8fbff;
+    transition: border 0.2s;
+}
+#nhaphang select:focus {
+    border: 1.5px solid #1976d2;
+    outline: none;
+}
+#chitietnhaphang-form {
+    background: #f8fbff;
+    border-radius: 8px;
+    padding: 24px 24px 16px 24px;
+    margin-top: 24px;
+    margin-bottom: 32px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+}
+#chitietnhaphang-form h3 {
+    margin-top: 0;
+    color: #1976d2;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+#chitietnhaphang-form label {
+    font-weight: 500;
+    margin-right: 8px;
+    color: #1976d2;
+}
+#chitietnhaphang-form .import-product-select,
+#chitietnhaphang-form .import-quantity,
+#chitietnhaphang-form .import-price {
+    padding: 6px 10px;
+    border: 1px solid #b0bec5;
+    border-radius: 4px;
+    font-size: 1rem;
+    margin-right: 12px;
+    min-width: 120px;
+    margin-bottom: 8px;
+}
+#chitietnhaphang-form .import-quantity {
+    min-width: 60px;
+    width: 80px;
+}
+#chitietnhaphang-form .import-price {
+    min-width: 80px;
+    width: 120px;
+}
+#chitietnhaphang-form button {
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 7px 18px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-bottom: 8px;
+}
+#chitietnhaphang-form button:hover {
+    background: #125ea7;
+}
+#imported-items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    background: #fff;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+#imported-items-table th, #imported-items-table td {
+    border: 1px solid #e3eaf1;
+    padding: 10px 8px;
+    text-align: center;
+    font-size: 1rem;
+}
+#imported-items-table th {
+    background: #e3f2fd;
+    color: #1976d2;
+    font-weight: 600;
+}
+#imported-items-table td {
+    background: #f9fbfd;
+}
+#imported-items-table .remove-item {
+    background: #e53935;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 12px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+#imported-items-table .remove-item:hover {
+    background: #b71c1c;
+}
+#import-total-amount {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #1976d2;
+    border: none;
+    background: transparent;
+    text-align: right;
+    width: 120px;
+}
+@media (max-width: 1100px) {
+    #chitietnhaphang-form {
+        padding: 12px 2px 8px 2px;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+    }
+    #imported-items-table th, #imported-items-table td {
+        padding: 6px 2px;
+        font-size: 0.95rem;
+    }
+}

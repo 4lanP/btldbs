@@ -14,6 +14,7 @@
         <button onclick="openTab('sanpham')"><i class="fas fa-box"></i> Sản phẩm</button>
         <button onclick="openTab('nhacungcap')"><i class="fas fa-truck"></i> Nhà cung cấp</button>
         <button onclick="openTab('hoadon')"><i class="fas fa-file-invoice"></i> Hóa đơn</button>
+        <button onclick="openTab('nhaphang')"><i class="fas fa-cart-plus"></i> Nhập hàng</button>
     </div>
     <div class="content">
         <div id="khachhang" class="tab-content">
@@ -139,9 +140,8 @@
                             <th>Tên sản phẩm</th>
                             <th>Đơn vị tính</th>
                             <th>Số lượng</th>
-                            <th>Ngày sản xuất</th>
-                            <th>Hạn sử dụng</th>
-                            <th>Giá tiền</th>
+                            <th>Giá tiền nhập</th>
+                            <th>Giá tiền bán</th>
                             <th>Hành động</th>
                         </tr>
                     </thead>
@@ -163,14 +163,11 @@
                     <label for="new-product-quantity">Số lượng:</label>
                     <input type="number" id="new-product-quantity"><br><br>
 
-                    <label for="new-product-mfg-date">Ngày sản xuất:</label>
-                    <input type="date" id="new-product-mfg-date"><br><br>
+                    <label for="new-product-purchase-price">Giá tiền nhập:</label>
+                    <input type="number" id="new-product-purchase-price"><br><br>
 
-                    <label for="new-product-exp-date">Hạn sử dụng:</label>
-                    <input type="date" id="new-product-exp-date"><br><br>
-
-                    <label for="new-product-price">Giá tiền:</label>
-                    <input type="number" id="new-product-price"><br><br>
+                    <label for="new-product-sale-price">Giá tiền bán:</label>
+                    <input type="number" id="new-product-sale-price"><br><br>
 
                     <button type="button" onclick="addProduct()">Lưu sản phẩm</button>
                 </form>
@@ -189,14 +186,11 @@
                     <label for="edit-product-quantity">Số lượng:</label>
                     <input type="number" id="edit-product-quantity"><br><br>
 
-                    <label for="edit-product-mfg-date">Ngày sản xuất:</label>
-                    <input type="date" id="edit-product-mfg-date"><br><br>
+                    <label for="edit-product-purchase-price">Giá tiền nhập:</label>
+                    <input type="number" id="edit-product-purchase-price"><br><br>
 
-                    <label for="edit-product-exp-date">Hạn sử dụng:</label>
-                    <input type="date" id="edit-product-exp-date"><br><br>
-
-                    <label for="edit-product-price">Giá tiền:</label>
-                    <input type="number" id="edit-product-price"><br><br>
+                    <label for="edit-product-sale-price">Giá tiền bán:</label>
+                    <input type="number" id="edit-product-sale-price"><br><br>
 
                     <button type="button" onclick="updateProduct()">Cập nhật sản phẩm</button>
                 </form>
@@ -328,6 +322,71 @@
                     </thead>
                     <tbody id="invoice-list"></tbody>
                 </table>
+            </div>
+        </div>
+
+        <div id="nhaphang" class="tab-content">
+            <div class="container">
+                <h2>Tạo phiếu nhập hàng</h2>
+                <label for="import-id">Mã phiếu nhập:</label>
+                <input type="text" id="import-id" readonly style="background:#f0f8ff;">
+                <br><br>
+                <label for="import-date">Ngày nhập:</label>
+                <input type="date" id="import-date">
+                <br><br>
+                <label for="import-supplier-id">Chọn nhà cung cấp:</label>
+                <select id="import-supplier-id">
+                    <option value="">-- Chọn nhà cung cấp --</option>
+                </select>
+                <br><br>
+                <label for="import-employee-id">Chọn nhân viên:</label>
+                <select id="import-employee-id">
+                    <option value="">-- Chọn nhân viên --</option>
+                </select>
+                <br><br>
+                <div id="chitietnhaphang-form">
+                    <h3>Chi tiết nhập hàng</h3>
+                    <div>
+                        <label>Chọn sản phẩm:</label>
+                        <select class="import-product-select" style="width: 300px;">
+                            <!-- Options sẽ được JS render, bao gồm option thêm sản phẩm mới -->
+                        </select>
+                        <label>Số lượng:</label>
+                        <input type="number" class="import-quantity" min="1" value="1">
+                        <label>Đơn giá nhập:</label>
+                        <input type="number" class="import-price" min="0" value="0">
+                    </div>
+                    <div id="new-product-form" style="display:none; margin-top:12px; background:#f9fbfd; border-radius:8px; padding:16px;">
+                        <h4 style="color:#1976d2; margin-top:0;">Thêm sản phẩm mới</h4>
+                        <label for="new-import-product-name">Tên sản phẩm:</label>
+                        <input type="text" id="new-import-product-name"><br>
+                        <label for="new-import-product-unit">Đơn vị tính:</label>
+                        <input type="text" id="new-import-product-unit"><br>
+                        <label for="new-import-product-purchase-price">Giá nhập:</label>
+                        <input type="number" id="new-import-product-purchase-price"><br>
+                        <label for="new-import-product-sale-price">Giá bán:</label>
+                        <input type="number" id="new-import-product-sale-price"><br>
+                    </div>
+                    <button type="button" onclick="addChiTietNhapHangItem()">Thêm vào phiếu nhập</button>
+                    <table id="imported-items-table" style="width: 100%; margin-top: 16px;">
+                        <thead>
+                            <tr>
+                                <th>Mã sản phẩm</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Số lượng</th>
+                                <th>Đơn giá nhập</th>
+                                <th>Thành tiền</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="imported-items-list"></tbody>
+                    </table>
+                    <div style="margin-top: 16px; text-align: right;">
+                        <label for="import-total-amount">Tổng tiền:</label>
+                        <input type="number" id="import-total-amount" readonly style="font-weight: bold;">
+                    </div>
+                </div>
+                <button class="add-button" onclick="saveImportOrder()">Lưu phiếu nhập</button>
             </div>
         </div>
     </div>
