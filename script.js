@@ -1347,12 +1347,14 @@ function removeAddedItem(button) {
 function calculateTotal() {
     const rows = document.querySelectorAll('#added-items-list tr');
     let total = 0;
-    
+
     rows.forEach(row => {
-        const thanhTien = parseFloat(row.cells[4].textContent.replace(/[^\d.-]/g, ''));
-        total += thanhTien;
+        // Lấy thành tiền, loại bỏ ký tự không phải số, dấu phẩy và chữ đ
+        let thanhTienStr = row.cells[4].textContent.replace(/[^\d,]/g, '').replace(/,/g, '');
+        let thanhTien = parseFloat(thanhTienStr);
+        if (!isNaN(thanhTien)) total += thanhTien;
     });
-    
+
     document.getElementById('total-amount').value = total;
 }
 
@@ -1394,12 +1396,13 @@ async function saveInvoice() {
             throw new Error('Failed to save hóa đơn');
         }
 
-        // Save ChiTietHoaDon items
+        // Save ChiTietHoaDon items & cập nhật số lượng sản phẩm
         for (const row of addedItems) {
             const maSanPham = parseInt(row.dataset.productId);
             const soLuong = parseInt(row.cells[2].textContent);
             const donGia = parseFloat(row.cells[3].textContent.replace(/[^\d.-]/g, ''));
 
+            // 1. Lưu chi tiết hóa đơn
             const chiTietResponse = await fetch('https://btldbs-api.onrender.com/api/chitiethoadon', {
                 method: 'POST',
                 headers: {
@@ -1416,10 +1419,48 @@ async function saveInvoice() {
             if (!chiTietResponse.ok) {
                 throw new Error('Failed to save chi tiết hóa đơn');
             }
+
+            // 2. Lấy sản phẩm hiện tại từ cache hoặc API
+            let product = productsCache.find(p => p.MaSanPham === maSanPham);
+            if (!product) {
+                // Nếu cache chưa có, lấy từ API
+                const prodRes = await fetch(`https://btldbs-api.onrender.com/api/sanpham/${maSanPham}`);
+                if (prodRes.ok) {
+                    product = await prodRes.json();
+                }
+            }
+            if (product) {
+                const newQuantity = Math.max(0, product.SoLuong - soLuong);
+                const formatDate = d => {
+                    const date = new Date(d);
+                    if (isNaN(date.getTime())) return '';
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                };
+                const updatedProduct = {
+                    MaSanPham: parseInt(product.MaSanPham),
+                    TenSanPham: product.TenSanPham,
+                    DonViTinh: product.DonViTinh,
+                    SoLuong: newQuantity,
+                    NgaySanXuat: formatDate(product.NgaySanXuat),
+                    HanSuDung: formatDate(product.HanSuDung),
+                    GiaTien: parseFloat(product.GiaTien)
+                };
+                await fetch(`https://btldbs-api.onrender.com/api/sanpham/${product.MaSanPham}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedProduct)
+                });
+            }
         }
 
         alert('Lưu hóa đơn thành công!');
         await fetchInvoices();
+        await fetchProducts(); // Cập nhật lại bảng sản phẩm
         resetInvoiceForm();
     } catch (error) {
         console.error('Error saving invoice:', error);
