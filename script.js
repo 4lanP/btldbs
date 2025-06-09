@@ -1981,3 +1981,65 @@ async function deleteImportOrder(maDon) {
         alert('Có lỗi xảy ra khi xóa phiếu nhập.');
     }
 }
+
+/**
+ * Đóng modal chi tiết đơn nhập hàng
+ */
+function closeImportDetailModal() {
+    document.getElementById('import-detail-modal').style.display = 'none';
+}
+
+/**
+ * Hiển thị chi tiết đơn nhập hàng
+ * @param {number} maDon - Mã đơn nhập hàng cần xem chi tiết
+ */
+async function showImportOrderDetail(maDon) {
+    try {
+        // Lấy toàn bộ chi tiết nhập hàng
+        const response = await fetch('https://btldbs-api.onrender.com/api/chitietnhaphang');
+        const chiTietList = await response.json();
+        const chiTietDonNhap = chiTietList.filter(item => item.MaDon === maDon);
+
+        // Lấy toàn bộ sản phẩm
+        const spRes = await fetch('https://btldbs-api.onrender.com/api/sanpham');
+        const spList = await spRes.json();
+
+        let content = `
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th>Mã sản phẩm</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá nhập</th>
+                        <th>Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        for (const chiTiet of chiTietDonNhap) {
+            const sanPham = spList.find(sp => sp.MaSanPham === chiTiet.MaSanPham);
+            content += `
+                <tr>
+                    <td>${String(chiTiet.MaSanPham).padStart(6, '0')}</td>
+                    <td>${sanPham ? sanPham.TenSanPham : ''}</td>
+                    <td>${chiTiet.SoLuong}</td>
+                    <td>${Number(chiTiet.DonGia).toLocaleString('vi-VN')} VNĐ</td>
+                    <td>${Number(chiTiet.SoLuong * chiTiet.DonGia).toLocaleString('vi-VN')} VNĐ</td>
+                </tr>
+            `;
+        }
+
+        content += `
+                </tbody>
+            </table>
+        `;
+
+        document.getElementById('import-detail-content').innerHTML = content;
+        document.getElementById('import-detail-modal').style.display = 'block';
+    } catch (error) {
+        console.error('Lỗi khi lấy chi tiết đơn nhập hàng:', error);
+        alert('Có lỗi xảy ra khi lấy chi tiết đơn nhập hàng.');
+    }
+}
