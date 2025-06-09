@@ -247,8 +247,8 @@
 
                     <button type="button" onclick="updateSupplier()">Cập nhật nhà cung cấp</button>
                 </form>
-            </div>
         </div>
+    </div>
 
         <div id="hoadon" class="tab-content">
             <div class="container">
@@ -414,6 +414,17 @@
             <span class="close" onclick="closeInvoiceDetailModal()">&times;</span>
             <h3>Chi tiết hóa đơn</h3>
             <div id="invoice-detail-content">
+                <!-- Details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for import order details -->
+    <div id="import-detail-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeImportDetailModal()">&times;</span>
+            <h3>Chi tiết đơn nhập hàng</h3>
+            <div id="import-detail-content">
                 <!-- Details will be loaded here -->
             </div>
         </div>
