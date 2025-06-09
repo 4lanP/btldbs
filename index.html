@@ -353,7 +353,7 @@
                         </select>
                         <label>Số lượng:</label>
                         <input type="number" class="import-quantity" min="1" value="1">
-                        <label>Đơn giá nhập:</label>
+                        <label class="import-price-label">Đơn giá nhập:</label>
                         <input type="number" class="import-price" min="0" value="0">
                     </div>
                     <div id="new-product-form" style="display:none; margin-top:12px; background:#f9fbfd; border-radius:8px; padding:16px;">
@@ -387,6 +387,21 @@
                     </div>
                 </div>
                 <button class="add-button" onclick="saveImportOrder()">Lưu phiếu nhập</button>
+
+                <table id="import-order-table" style="margin-top:32px; width:100%;">
+                    <thead>
+                        <tr>
+                            <th>ID Nhà cung cấp</th>
+                            <th>ID Nhân viên</th>
+                            <th>Mã đơn</th>
+                            <th>Ngày</th>
+                            <th>Tổng tiền</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="import-order-list">
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

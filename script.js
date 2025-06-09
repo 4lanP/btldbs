@@ -80,6 +80,7 @@ async function openTab(tabName) {
         // Reset bảng tạm
         document.getElementById('imported-items-list').innerHTML = '';
         document.getElementById('import-total-amount').value = '';
+        fetchImportOrders();
     }
         }
 
@@ -1678,27 +1679,35 @@ async function populateImportDropdowns() {
     productSelect.appendChild(newOption);
     // Sự kiện thay đổi dropdown
     productSelect.onchange = function() {
-        const priceInput = document.querySelector('.import-price');
-        const newProductForm = document.getElementById('new-product-form');
-        if (this.value === 'new') {
-            newProductForm.style.display = 'block';
-            priceInput.value = '';
+    const priceInput = document.querySelector('.import-price');
+    const priceLabel = document.querySelector('.import-price-label');
+    const newProductForm = document.getElementById('new-product-form');
+    if (this.value === 'new') {
+        newProductForm.style.display = 'block';
+        // Ẩn label và input đơn giá nhập
+        priceInput.style.display = 'none';
+        priceLabel.style.display = 'none';
+    } else if (this.value) {
+        newProductForm.style.display = 'none';
+        const prod = products.find(p => p.MaSanPham == this.value);
+        if (prod) {
+            priceInput.value = prod.GiaTienNhap;
             priceInput.disabled = true;
-        } else if (this.value) {
-            newProductForm.style.display = 'none';
-            const prod = products.find(p => p.MaSanPham == this.value);
-            if (prod) {
-                priceInput.value = prod.GiaTienNhap;
-                priceInput.disabled = true;
-            } else {
-                priceInput.value = '';
-                priceInput.disabled = false;
-            }
         } else {
-            newProductForm.style.display = 'none';
             priceInput.value = '';
             priceInput.disabled = false;
         }
+        // Hiện lại label và input đơn giá nhập
+        priceInput.style.display = '';
+        priceLabel.style.display = '';
+    } else {
+        newProductForm.style.display = 'none';
+        priceInput.value = '';
+        priceInput.disabled = false;
+        // Hiện lại label và input đơn giá nhập
+        priceInput.style.display = '';
+        priceLabel.style.display = '';
+    }
     };
 }
 
@@ -1718,7 +1727,7 @@ async function generateNextImportId() {
 }
 
 async function addChiTietNhapHangItem() {
-    const productSelect = document.querySelector('.import-product-select');
+             const productSelect = document.querySelector('.import-product-select');
     const quantityInput = document.querySelector('.import-quantity');
     const priceInput = document.querySelector('.import-price');
     const productId = productSelect.value;
@@ -1922,5 +1931,53 @@ async function saveImportOrder() {
     } catch (error) {
         console.error('Lỗi khi lưu phiếu nhập:', error);
         alert('Có lỗi xảy ra khi lưu phiếu nhập');
+    }
+}
+
+async function fetchImportOrders() {
+    try {
+        const res = await fetch('https://btldbs-api.onrender.com/api/donnhaphang');
+        const data = await res.json();
+        const tableBody = document.getElementById('import-order-list');
+        tableBody.innerHTML = '';
+        data.forEach(order => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${order.IdNhaCungCap}</td>
+                <td>${order.IdNhanVien}</td>
+                <td>${String(order.MaDon).padStart(6, '0')}</td>
+                <td>${order.Ngay.length === 10 ? order.Ngay : (new Date(order.Ngay)).toISOString().slice(0,10)}</td>
+                <td>${Number(order.TongTien).toLocaleString('vi-VN')}</td>
+                <td>
+                    <button class="detail-button" onclick="showImportOrderDetail(${order.MaDon})">Chi tiết</button>
+                    <button class="delete-button" onclick="deleteImportOrder(${order.MaDon})">Xóa</button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+    } catch (error) {
+        alert('Không thể tải dữ liệu phiếu nhập!');
+    }
+}
+
+/**
+ * Xóa phiếu nhập hàng theo mã đơn (MaDon)
+ * @param {number} maDon - Mã đơn của phiếu nhập cần xóa
+ */
+async function deleteImportOrder(maDon) {
+    if (!confirm(`Bạn có chắc chắn muốn xóa phiếu nhập có mã ${String(maDon).padStart(6, '0')}?`)) return;
+    try {
+        const response = await fetch(`https://btldbs-api.onrender.com/api/donnhaphang/${maDon}`, {
+            method: 'DELETE'
+        });
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Lỗi xóa phiếu nhập: ${response.status} - ${errorText}`);
+        }
+        alert(`Đã xóa phiếu nhập có mã ${String(maDon).padStart(6, '0')}!`);
+        fetchImportOrders();
+    } catch (error) {
+        console.error('Lỗi khi xóa phiếu nhập:', error);
+        alert('Có lỗi xảy ra khi xóa phiếu nhập.');
     }
 }
