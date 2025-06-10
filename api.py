@@ -41,7 +41,7 @@ def validate_khachhang(data):
     return True, "Dữ Liệu hợp lệ"
 
 def validate_hoadon(data):
-    if not all(key in data for key in ['MaDon', 'Ngay', 'TongTien', 'IdKhachHang']):
+    if not all(key in data for key in ['MaDon', 'Ngay', 'TongTien', 'IdKhachHang', 'IdNhanVien']):
         return False, "Thiếu Dữ Liệu"
     if not isinstance(data['MaDon'], int):
         return False, "MaDon phải là số nguyên"
@@ -53,6 +53,8 @@ def validate_hoadon(data):
         return False, "TongTien không hợp lệ"
     if not isinstance(data['IdKhachHang'], int):
         return False, "IdKhachHang phải là số nguyên"
+    if not isinstance(data['IdNhanVien'], int):
+        return False, "IdNhanVien phải là số nguyên"
     return True, "Dữ Liệu hợp lệ"
 
 def validate_nhanvien(data):
@@ -77,23 +79,24 @@ def validate_nhanvien(data):
     return True, "Dữ Liệu hợp lệ"
 
 def validate_sanpham(data):
-    if not all(key in data for key in ['MaSanPham', 'TenSanPham', 'DonViTinh', 'SoLuong', 'NgaySanXuat', 'HanSuDung', 'GiaTien']):
-        return False, "Thiếu Dữ Liệu"
+    # Kiểm tra đủ trường
+    required_fields = ['MaSanPham', 'TenSanPham', 'DonViTinh', 'SoLuong', 'GiaTienBan', 'GiaTienNhap']
+    for key in required_fields:
+        if key not in data or data[key] is None:
+            return False, f"Thiếu hoặc null trường {key}"
+    # Kiểm tra kiểu và độ dài
     if not isinstance(data['MaSanPham'], int):
         return False, "MaSanPham phải là số nguyên"
-    if not isinstance(data['TenSanPham'], str) or len(data['TenSanPham']) > 100:
-        return False, "TenSanPham không hợp lệ"
-    if not isinstance(data['DonViTinh'], str) or len(data['DonViTinh']) > 50:
-        return False, "DonViTinh không hợp lệ"
+    if not isinstance(data['TenSanPham'], str) or not data['TenSanPham'] or len(data['TenSanPham']) > 100:
+        return False, "TenSanPham không hợp lệ (bắt buộc, tối đa 100 ký tự)"
+    if not isinstance(data['DonViTinh'], str) or not data['DonViTinh'] or len(data['DonViTinh']) > 50:
+        return False, "DonViTinh không hợp lệ (bắt buộc, tối đa 50 ký tự)"
     if not isinstance(data['SoLuong'], int) or data['SoLuong'] < 0:
-        return False, "SoLuong không hợp lệ"
-    try:
-        datetime.strptime(data['NgaySanXuat'], '%Y-%m-%d')
-        datetime.strptime(data['HanSuDung'], '%Y-%m-%d')
-    except:
-        return False, "Sai Định Dạng Ngày (YYYY-MM-DD)"
-    if not isinstance(data['GiaTien'], (int, float)) or data['GiaTien'] < 0:
-        return False, "GiaTien không hợp lệ"
+        return False, "SoLuong không hợp lệ (bắt buộc, >=0)"
+    if not isinstance(data['GiaTienBan'], (int, float)) or data['GiaTienBan'] < 0:
+        return False, "GiaTienBan không hợp lệ (bắt buộc, >=0)"
+    if not isinstance(data['GiaTienNhap'], (int, float)) or data['GiaTienNhap'] < 0:
+        return False, "GiaTienNhap không hợp lệ (bắt buộc, >=0)"
     return True, "Dữ Liệu hợp lệ"
 
 def validate_chitiethoadon(data):
@@ -123,7 +126,7 @@ def validate_nhacungcap(data):
     return True, "Dữ Liệu hợp lệ"
 
 def validate_donnhaphang(data):
-    if not all(key in data for key in ['MaDon', 'Ngay', 'TongTien', 'IdNhaCungCap']):
+    if not all(key in data for key in ['MaDon', 'Ngay', 'TongTien', 'IdNhaCungCap', 'IdNhanVien']):
         return False, "Missing required fields"
     if not isinstance(data['MaDon'], int):
         return False, "MaDon phải là số nguyên"
@@ -135,6 +138,8 @@ def validate_donnhaphang(data):
         return False, "TongTien không hợp lệ"
     if not isinstance(data['IdNhaCungCap'], int):
         return False, "IdNhaCungCap phải là số nguyên"
+    if not isinstance(data['IdNhanVien'], int):
+        return False, "IdNhanVien phải là số nguyên"
     return True, "Dữ Liệu hợp lệ"
 
 def validate_chitietnhaphang(data):
@@ -238,8 +243,8 @@ def create_hoadon():
     
     cursor = conn.cursor()
     try:
-        cursor.execute("INSERT INTO HoaDon (MaDon, Ngay, TongTien, IdKhachHang) VALUES (%s, %s, %s, %s)",
-                      (data['MaDon'], data['Ngay'], data['TongTien'], data['IdKhachHang']))
+        cursor.execute("INSERT INTO HoaDon (MaDon, Ngay, TongTien, IdKhachHang, IdNhanVien) VALUES (%s, %s, %s, %s, %s)",
+                      (data['MaDon'], data['Ngay'], data['TongTien'], data['IdKhachHang'], data['IdNhanVien']))
         conn.commit()
         return jsonify({"message": "Tạo HoaDon Thành Công"})
     except pymysql.Error as e:
@@ -255,8 +260,8 @@ def update_hoadon(id):
     
     cursor = conn.cursor()
     try:
-        cursor.execute("UPDATE HoaDon SET Ngay = %s, TongTien = %s, IdKhachHang = %s WHERE MaDon = %s",
-                      (data['Ngay'], data['TongTien'], data['IdKhachHang'], id))
+        cursor.execute("UPDATE HoaDon SET Ngay = %s, TongTien = %s, IdKhachHang = %s, IdNhanVien = %s WHERE MaDon = %s",
+                      (data['Ngay'], data['TongTien'], data['IdKhachHang'], data['IdNhanVien'], id))
         conn.commit()
         return jsonify({"message": "Cập Nhật HoaDon Thành Công"})
     except pymysql.Error as e:
@@ -344,8 +349,8 @@ def create_sanpham():
     
     cursor = conn.cursor()
     try:
-        cursor.execute("INSERT INTO SanPham (MaSanPham, TenSanPham, DonViTinh, SoLuong, NgaySanXuat, HanSuDung, GiaTien) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                      (data['MaSanPham'], data['TenSanPham'], data['DonViTinh'], data['SoLuong'], data['NgaySanXuat'], data['HanSuDung'], data['GiaTien']))
+        cursor.execute("INSERT INTO SanPham (MaSanPham, TenSanPham, DonViTinh, SoLuong, GiaTienBan, GiaTienNhap) VALUES (%s, %s, %s, %s, %s, %s)",
+                      (data['MaSanPham'], data['TenSanPham'], data['DonViTinh'], data['SoLuong'], data['GiaTienBan'], data['GiaTienNhap']))
         conn.commit()
         return jsonify({"message": "Tạo SanPham Thành Công"})
     except pymysql.Error as e:
@@ -361,8 +366,8 @@ def update_sanpham(id):
     
     cursor = conn.cursor()
     try:
-        cursor.execute("UPDATE SanPham SET TenSanPham = %s, DonViTinh = %s, SoLuong = %s, NgaySanXuat = %s, HanSuDung = %s, GiaTien = %s WHERE MaSanPham = %s",
-                      (data['TenSanPham'], data['DonViTinh'], data['SoLuong'], data['NgaySanXuat'], data['HanSuDung'], data['GiaTien'], id))
+        cursor.execute("UPDATE SanPham SET TenSanPham = %s, DonViTinh = %s, SoLuong = %s, GiaTienBan = %s, GiaTienNhap = %s WHERE MaSanPham = %s",
+                      (data['TenSanPham'], data['DonViTinh'], data['SoLuong'], data['GiaTienBan'], data['GiaTienNhap'], id))
         conn.commit()
         return jsonify({"message": "Cập Nhật SanPham Thành Công"})
     except pymysql.Error as e:
@@ -379,6 +384,16 @@ def delete_sanpham(id):
     except pymysql.Error as e:
         conn.rollback()
         return jsonify({"error": str(e)}), 500
+
+@app.route('/api/sanpham/<int:id>', methods=['GET'])
+def get_sanpham_by_id(id):
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    cursor.execute("SELECT * FROM SanPham WHERE MaSanPham = %s", (id,))
+    data = cursor.fetchone()
+    if data:
+        return jsonify(data)
+    else:
+        return jsonify({"error": "Không tìm thấy sản phẩm"}), 404
 
 # ChiTietHoaDon CRUD
 @app.route('/api/chitiethoadon', methods=['GET'])
@@ -512,8 +527,8 @@ def create_donnhaphang():
     
     cursor = conn.cursor()
     try:
-        cursor.execute("INSERT INTO DonNhapHang (MaDon, Ngay, TongTien, IdNhaCungCap) VALUES (%s, %s, %s, %s)",
-                      (data['MaDon'], data['Ngay'], data['TongTien'], data['IdNhaCungCap']))
+        cursor.execute("INSERT INTO DonNhapHang (MaDon, Ngay, TongTien, IdNhaCungCap, IdNhanVien) VALUES (%s, %s, %s, %s, %s)",
+                      (data['MaDon'], data['Ngay'], data['TongTien'], data['IdNhaCungCap'], data['IdNhanVien']))
         conn.commit()
         return jsonify({"message": "Tạo DonNhapHang Thành Công"})
     except pymysql.Error as e:
@@ -529,8 +544,8 @@ def update_donnhaphang(id):
     
     cursor = conn.cursor()
     try:
-        cursor.execute("UPDATE DonNhapHang SET Ngay = %s, TongTien = %s, IdNhaCungCap = %s WHERE MaDon = %s",
-                      (data['Ngay'], data['TongTien'], data['IdNhaCungCap'], id))
+        cursor.execute("UPDATE DonNhapHang SET Ngay = %s, TongTien = %s, IdNhaCungCap = %s, IdNhanVien = %s WHERE MaDon = %s",
+                      (data['Ngay'], data['TongTien'], data['IdNhaCungCap'], data['IdNhanVien'], id))
         conn.commit()
         return jsonify({"message": "Cập Nhật DonNhapHang Thành Công"})
     except pymysql.Error as e:
