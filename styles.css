@@ -10,44 +10,51 @@ body {
 }
 
 .sidebar {
-    width: 220px;
-    background-color: #e1f5fe; /* Lighter blue sidebar */
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    padding: 20px 0;
+    width: auto;
+    background-color: transparent;
+    box-shadow: none;
+    padding: 0;
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* Align items to the left */
-    height: 1000vh; /* Full height sidebar */
+    align-items: flex-start;
+    height: auto;
+    margin-top: 40px; /* Thêm dòng này để dịch các nút xuống dưới */
 }
 
 .sidebar button {
     display: flex;
     align-items: center;
-    width: 100%;
-    padding: 12px 20px; /* Slightly more padding */
-    margin-bottom: 8px; /* More margin between buttons */
+    width: 234px;
+    padding: 12px 0; /* Tăng chiều cao dọc */
+    margin-bottom: 16px;
     border: none;
-    background-color: transparent;
-    color: #333;
+    background-color: #e3f2fd;
+    color: #1976d2;
     cursor: pointer;
-    text-align: left;
-    transition: background-color 0.3s ease;
-    font-size: 1em;
+    text-align: center;
+    justify-content: center;
+    transition: background 0.08s, color 0.08s, box-shadow 0.08s;
+    font-size: 1.08em;
+    border-radius: 18px;
+    box-shadow: 0 1px 4px rgba(25, 118, 210, 0.08);
+    font-weight: 600;
+    gap: 10px;
 }
 
-.sidebar button:hover {
-    background-color: #bbdefb; /* Slightly darker blue hover */
+.sidebar button:hover,
+.sidebar button.active,
+.sidebar button:focus {
+    background-color: #1976d2;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.13);
+    outline: none;
 }
 
-.sidebar button.active {
-    background-color: #bbdefb; /* Active button color */
-    font-weight: bold;
-}
-
+.sidebar button i,
 .sidebar button svg {
-    margin-right: 12px;
-    font-size: 1.2em; /* Adjust icon size */
-    color: #1976d2; /* Blue icon color */
+    margin-right: 8px;
+    font-size: 1.2em;
+    color: inherit;
 }
 
 .content {

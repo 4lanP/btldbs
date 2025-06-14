@@ -1324,6 +1324,12 @@ async function addChiTietHoaDonItem() {
         alert('Không tìm thấy sản phẩm!');
         return;
     }
+
+    // Kiểm tra số lượng tồn kho
+    if (quantity > product.SoLuong) {
+        alert(`Số lượng trong kho chỉ còn ${product.SoLuong}. Không thể bán vượt quá số lượng này!`);
+        return;
+    }
     
     // Check if product is already in the list
     const existingRow = document.querySelector(`#added-items-list tr[data-product-id="${productId}"]`);
@@ -1566,8 +1572,9 @@ async function deleteInvoice(maDon) {
 async function fetchInvoices() {
     try {
         const res = await fetch('https://btldbs-api.onrender.com/api/hoadon');
-        const data = await res.json();
-        console.log(data);
+        let data = await res.json();
+        // Sắp xếp theo MaDon giảm dần (mới nhất trước)
+        data.sort((a, b) => Number(b.MaDon) - Number(a.MaDon));
         const invoiceList = document.getElementById('invoice-list');
         invoiceList.innerHTML = '';
         data.forEach(inv => {
@@ -1938,6 +1945,8 @@ async function fetchImportOrders() {
     try {
         const res = await fetch('https://btldbs-api.onrender.com/api/donnhaphang');
         const data = await res.json();
+        // Sắp xếp theo MaDon giảm dần (mới nhất trước)
+        data.sort((a, b) => Number(b.MaDon) - Number(a.MaDon));
         const tableBody = document.getElementById('import-order-list');
         tableBody.innerHTML = '';
         data.forEach(order => {
