@@ -168,14 +168,22 @@ td:nth-child(1), td:nth-child(6), td:nth-child(7) {
 }
 
 .delete-button {
-    background: #ffcdd2;
-    color: #d32f2f;
-    border: 1.5px solid #ef9a9a;
+    background: #ffcdd2 !important;
+    color: #d32f2f !important;
+    border: 1.5px solid #ef9a9a !important;
+    border-radius: 20px !important;
+    font-size: 1em !important;
+    font-weight: 500 !important;
+    padding: 8px 18px !important;
+    margin-left: 6px !important;
+    box-shadow: 0 1px 4px rgba(25, 118, 210, 0.08) !important;
+    transition: background 0.18s, color 0.18s, box-shadow 0.18s !important;
+    cursor: pointer;
 }
 .delete-button:hover {
-    background: #d32f2f;
-    color: #fff;
-    border: 1.5px solid #d32f2f;
+    background: #d32f2f !important;
+    color: #fff !important;
+    border: 1.5px solid #d32f2f !important;
 }
 
 /* Changed from div to form for reset() method to work */
@@ -501,21 +509,23 @@ td:nth-child(1), td:nth-child(6), td:nth-child(7) {
     background: #f9fbfd;
 }
 .detail-button {
-    background-color: #e3f2fd;
-    color: #1976d2;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 16px;
-    font-size: 1em;
+    background: #e3f2fd !important;
+    color: #1976d2 !important;
+    border: 1.5px solid #90caf9 !important;
+    border-radius: 20px !important;
+    font-size: 1em !important;
+    font-weight: 500 !important;
+    padding: 8px 18px !important;
+    margin-left: 6px !important;
+    box-shadow: 0 1px 4px rgba(25, 118, 210, 0.08) !important;
+    transition: background 0.18s, color 0.18s, box-shadow 0.18s !important;
     cursor: pointer;
-    margin-left: 8px;
-    transition: background 0.2s, color 0.2s;
-    font-weight: 500;
+    outline: none;
 }
-
 .detail-button:hover {
-    background-color: #1976d2;
-    color: #fff;
+    background: #1976d2 !important;
+    color: #fff !important;
+    border: 1.5px solid #1976d2 !important;
 }
 #save {
     margin-left: auto;
