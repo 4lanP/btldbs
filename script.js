@@ -1,3 +1,4 @@
+const API_BASE = "https://btldbs-api.onrender.com/api";
 let currentEditingEmployeeId = null;
         let currentEditingProductId = null;
         let currentEditingCustomerId = null;
@@ -352,11 +353,12 @@ async function openTab(tabName) {
          * @returns {number} The calculated age.
          */
         function calculateAge(dobStr) {
-            const birthDate = new Date(dobStr);
+            const dob = new Date(dobStr);
             const today = new Date();
-            let age = today.getFullYear() - birthDate.getFullYear();
-            const monthDiff = today.getMonth() - birthDate.getMonth();
-            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            let age = today.getFullYear() - dob.getFullYear();
+            const monthDiff = today.getMonth() - dob.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
                 age--;
             }
             return age;
@@ -401,7 +403,7 @@ async function openTab(tabName) {
         async function generateNextEmployeeId() {
             try {
                 console.log('Generating next employee ID...');
-                const response = await fetch('https://btldbs-api.onrender.com/api/nhanvien');
+                const response = await fetch(`${API_BASE}/nhanvien`);
                 if (!response.ok) {
                     throw new Error('Network response was not ok when fetching employee IDs');
                 }
@@ -430,7 +432,7 @@ async function openTab(tabName) {
         async function generateNextProductId() {
             try {
                 console.log('Generating next product ID...');
-                const response = await fetch('https://btldbs-api.onrender.com/api/sanpham');
+                const response = await fetch(`${API_BASE}/sanpham`);
                 if (!response.ok) {
                     throw new Error('Network response was not ok when fetching product IDs');
                 }
@@ -458,7 +460,7 @@ async function openTab(tabName) {
         async function generateNextCustomerId() {
             try {
                 console.log('Generating next customer ID...');
-                const response = await fetch('https://btldbs-api.onrender.com/api/khachhang'); // Assuming API endpoint for customers
+                const response = await fetch(`${API_BASE}/khachhang`); // Assuming API endpoint for customers
                 if (!response.ok) {
                     throw new Error('Network response was not ok when fetching customer IDs');
                 }
@@ -485,7 +487,7 @@ async function openTab(tabName) {
         async function generateNextSupplierId() {
             try {
                 console.log('Generating next supplier ID...');
-                const response = await fetch('https://btldbs-api.onrender.com/api/nhacungcap'); // Assuming API endpoint for suppliers
+                const response = await fetch(`${API_BASE}/nhacungcap`); // Assuming API endpoint for suppliers
                 if (!response.ok) {
                     throw new Error('Network response was not ok when fetching supplier IDs');
                 }
@@ -509,55 +511,47 @@ async function openTab(tabName) {
          * Handles adding a new employee to the database via API.
          */
         async function addEmployee() {
-            // ID is now auto-generated and readonly, so we get it from the input
-            const id = document.getElementById('new-employee-id').value;
-            const name = document.getElementById('new-employee-name').value;
-            const position = document.getElementById('new-employee-position').value;
-            const dobInput = document.getElementById('new-employee-dob').value;
-            const address = document.getElementById('new-employee-address').value;
-            const salary = document.getElementById('new-employee-salary').value;
+            const idInput = document.getElementById('new-employee-id');
+            const nameInput = document.getElementById('new-employee-name');
+            const positionInput = document.getElementById('new-employee-position');
+            const dobInput = document.getElementById('new-employee-dob');
+            const addressInput = document.getElementById('new-employee-address');
+            const salaryInput = document.getElementById('new-employee-salary');
 
-            // Basic validation
-            if (!id || !name || !position || !dobInput || !address || !salary) {
-                alert('Vui lòng điền đầy đủ thông tin nhân viên.'); // Using alert as a simple fallback
-                return;
-            }
-
-            const newEmployee = {
-                IdNhanVien: parseInt(id),
-                Ten: name,
-                ChucVu: position,
-                NgayThangNamSinh: dobInput, // API expects YYYY-MM-DD
-                DiaChi: address,
-                Luong: parseFloat(salary),
-                Tuoi: calculateAge(dobInput)
+            const data = {
+                IdNhanVien: parseInt(idInput.value),
+                Ten: nameInput.value,
+                ChucVu: positionInput.value,
+                NgayThangNamSinh: dobInput.value,
+                DiaChi: addressInput.value,
+                Luong: parseFloat(salaryInput.value)
             };
 
-            console.log('Attempting to add new employee:', newEmployee);
+            console.log('Attempting to add new employee:', data);
 
             try {
-                const response = await fetch('https://btldbs-api.onrender.com/api/nhanvien', {
+                const response = await fetch(`${API_BASE}/nhanvien`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(newEmployee)
+                    body: JSON.stringify(data)
                 });
 
                 if (!response.ok) {
                     const errorText = await response.text();
                     throw new Error(`Lỗi thêm nhân viên: ${response.status} - ${errorText}`);
                 }
-                const result = await response.json(); // Assuming API returns JSON on success
+                const result = await response.json();
                 console.log('Employee added successfully:', result);
 
-                fetchEmployees(); // Refresh the table
-                toggleEmployeeForm('add'); // Close the form
-                document.getElementById('add-employee-form').reset(); // Correctly reset the form fields
-                alert('Thêm nhân viên thành công!'); // Using alert as a simple fallback
+                fetchEmployees();
+                toggleEmployeeForm('add');
+                document.getElementById('add-employee-form').reset();
+                alert('Thêm nhân viên thành công!');
             } catch (error) {
                 console.error('Lỗi khi thêm nhân viên:', error);
-                alert('Có lỗi xảy ra khi thêm nhân viên.'); // Using alert as a simple fallback
+                alert('Có lỗi xảy ra khi thêm nhân viên.');
             }
         }
 
@@ -565,54 +559,47 @@ async function openTab(tabName) {
          * Handles updating an existing employee in the database via API.
          */
         async function updateEmployee() {
-            const id = document.getElementById('edit-employee-id').value;
-            const name = document.getElementById('edit-employee-name').value;
-            const position = document.getElementById('edit-employee-position').value;
-            const dobInput = document.getElementById('edit-employee-dob').value;
-            const address = document.getElementById('edit-employee-address').value;
-            const salary = document.getElementById('edit-employee-salary').value;
+            const idInput = document.getElementById('edit-employee-id');
+            const nameInput = document.getElementById('edit-employee-name');
+            const positionInput = document.getElementById('edit-employee-position');
+            const dobInput = document.getElementById('edit-employee-dob');
+            const addressInput = document.getElementById('edit-employee-address');
+            const salaryInput = document.getElementById('edit-employee-salary');
 
-            // Basic validation
-            if (!name || !position || !dobInput || !address || !salary) {
-                alert('Vui lòng điền đầy đủ thông tin.'); // Using alert as a simple fallback
-                return;
-            }
-
-            const updatedEmployee = {
-                IdNhanVien: parseInt(id),
-                Ten: name,
-                ChucVu: position,
-                NgayThangNamSinh: dobInput, // API expects YYYY-MM-DD
-                DiaChi: address,
-                Luong: parseFloat(salary),
-                Tuoi: calculateAge(dobInput)
+            const data = {
+                IdNhanVien: parseInt(idInput.value),
+                Ten: nameInput.value,
+                ChucVu: positionInput.value,
+                NgayThangNamSinh: dobInput.value,
+                DiaChi: addressInput.value,
+                Luong: parseFloat(salaryInput.value)
             };
 
-            console.log('Attempting to update employee:', updatedEmployee);
+            console.log('Attempting to update employee:', data);
 
             try {
-                const response = await fetch(`https://btldbs-api.onrender.com/api/nhanvien/${currentEditingEmployeeId}`, {
+                const response = await fetch(`${API_BASE}/nhanvien/${currentEditingEmployeeId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(updatedEmployee)
+                    body: JSON.stringify(data)
                 });
 
                 if (!response.ok) {
                     const errorText = await response.text();
                     throw new Error(`Lỗi cập nhật nhân viên: ${response.status} - ${errorText}`);
                 }
-                const result = await response.json(); // Assuming API returns JSON on success
+                const result = await response.json();
                 console.log('Employee updated successfully:', result);
 
-                fetchEmployees(); // Refresh the table
-                toggleEmployeeForm(); // Hide both forms
-                currentEditingEmployeeId = null; // Clear editing ID
-                alert('Cập nhật nhân viên thành công!'); // Using alert as a simple fallback
+                fetchEmployees();
+                toggleEmployeeForm();
+                currentEditingEmployeeId = null;
+                alert('Cập nhật nhân viên thành công!');
             } catch (error) {
                 console.error('Lỗi khi cập nhật nhân viên:', error);
-                alert('Có lỗi xảy ra khi cập nhật nhân viên.'); // Using alert as a simple fallback
+                alert('Có lỗi xảy ra khi cập nhật nhân viên.');
             }
         }
 
@@ -622,12 +609,11 @@ async function openTab(tabName) {
          */
         async function deleteEmployee(button) {
             const row = button.parentNode.parentNode;
-            // Get ID from the first cell, remove leading zeros for API call if needed
             const employeeId = parseInt(row.cells[0].textContent);
 
             console.log(`Attempting to delete employee with ID: ${employeeId}`);
             try {
-                const response = await fetch(`https://btldbs-api.onrender.com/api/nhanvien/${employeeId}`, {
+                const response = await fetch(`${API_BASE}/nhanvien/${employeeId}`, {
                     method: 'DELETE'
                 });
 
@@ -637,11 +623,11 @@ async function openTab(tabName) {
                 }
                 console.log(`Employee with ID ${employeeId} deleted successfully.`);
 
-                fetchEmployees(); // Refresh the table
-                alert(`Đã xóa nhân viên có ID ${String(employeeId).padStart(6, '0')}!`); // Using alert as a simple fallback
+                fetchEmployees();
+                alert(`Đã xóa nhân viên có ID ${String(employeeId).padStart(6, '0')}!`);
             } catch (error) {
                 console.error('Lỗi khi xóa nhân viên:', error);
-                alert('Có lỗi xảy ra khi xóa nhân viên.'); // Using alert as a simple fallback
+                alert('Có lỗi xảy ra khi xóa nhân viên.');
             }
         }
 
@@ -651,63 +637,69 @@ async function openTab(tabName) {
          */
         function editEmployee(button) {
             const row = button.parentNode.parentNode;
-            const employeeData = {
+            const employee = {
                 IdNhanVien: parseInt(row.cells[0].textContent),
                 Ten: row.cells[1].textContent,
                 ChucVu: row.cells[2].textContent,
-                // When parsing from table, use the displayed format, then convert for input
-                NgayThangNamSinh: row.cells[3].textContent,
+                NgayThangNamSinh: formatDateForInput(row.cells[3].textContent),
                 DiaChi: row.cells[4].textContent,
-                // Remove non-numeric characters and handle comma as decimal for salary
-                Luong: parseFloat(row.cells[5].textContent.replace(/[^0-9,.]/g,"").replace(",", ".")),
-                Tuoi: parseInt(row.cells[6].textContent),
+                Luong: parseFloat(row.cells[5].textContent)
             };
-            console.log('Editing employee:', employeeData);
-            toggleEmployeeForm('edit', employeeData);
+            console.log('Editing employee:', employee);
+            toggleEmployeeForm('edit', employee);
         }
 
         /**
          * Fetches employee data from the API and populates the HTML table.
          */
         async function fetchEmployees() {
-            console.log('Fetching all employees from API...');
             try {
-                const response = await fetch('https://btldbs-api.onrender.com/api/nhanvien');
-                if (!response.ok) {
-                    throw new Error('Lỗi mạng hoặc không tìm thấy tài nguyên');
-                }
-                const data = await response.json();
-                console.log('Received employee data for table update:', data);
-                const employeeList = document.getElementById('employee-list');
-                employeeList.innerHTML = ''; // Clear old data
+                const response = await fetch(`${API_BASE}/nhanvien`);
+                const employees = await response.json();
+                const tbody = document.getElementById('employee-list');
+                tbody.innerHTML = '';
+                employees.forEach(employee => {
+                    const row = document.createElement('tr');
+                    const idCell = document.createElement('td');
+                    idCell.textContent = employee.IdNhanVien;
+                    row.appendChild(idCell);
 
-                data.forEach(employee => {
-                    const newRow = employeeList.insertRow();
-                    const idCell = newRow.insertCell();
-                    const nameCell = newRow.insertCell();
-                    const positionCell = newRow.insertCell();
-                    const dobCell = newRow.insertCell();
-                    const addressCell = newRow.insertCell();
-                    const salaryCell = newRow.insertCell();
-                    const ageCell = newRow.insertCell();
-                    const actionsCell = newRow.insertCell();
-                    actionsCell.classList.add('action-buttons');
-
-                    idCell.textContent = String(employee.IdNhanVien).padStart(6, '0'); // Format ID here
+                    const nameCell = document.createElement('td');
                     nameCell.textContent = employee.Ten;
+                    row.appendChild(nameCell);
+
+                    const positionCell = document.createElement('td');
                     positionCell.textContent = employee.ChucVu;
+                    row.appendChild(positionCell);
+
+                    const dobCell = document.createElement('td');
                     dobCell.textContent = formatDate(employee.NgayThangNamSinh);
+                    row.appendChild(dobCell);
+
+                    const addressCell = document.createElement('td');
                     addressCell.textContent = employee.DiaChi;
-                    salaryCell.textContent = parseFloat(employee.Luong).toLocaleString('vi-VN'); // Format currency for display
-                    ageCell.textContent = employee.Tuoi;
-                    actionsCell.innerHTML = `
+                    row.appendChild(addressCell);
+
+                    const salaryCell = document.createElement('td');
+                    salaryCell.textContent = employee.Luong;
+                    row.appendChild(salaryCell);
+
+                    const ageCell = document.createElement('td');
+                    ageCell.textContent = calculateAge(employee.NgayThangNamSinh);
+                    row.appendChild(ageCell);
+
+                    const actionCell = document.createElement('td');
+                    actionCell.className = 'action-buttons';
+                    actionCell.innerHTML = `
                         <button class="edit-button" onclick="editEmployee(this)">Sửa</button>
                         <button class="delete-button" onclick="deleteEmployee(this)">Xóa</button>
                     `;
+                    row.appendChild(actionCell);
+
+                    tbody.appendChild(row);
                 });
             } catch (error) {
-                console.error('Lỗi khi lấy dữ liệu nhân viên từ API:', error);
-                alert('Không thể tải dữ liệu nhân viên. Vui lòng thử lại sau.'); // Using alert as a simple fallback
+                console.error('Error fetching employees:', error);
             }
         }
 
@@ -737,7 +729,7 @@ async function openTab(tabName) {
             };
 
             try {
-                const response = await fetch('https://btldbs-api.onrender.com/api/sanpham', {
+                const response = await fetch(`${API_BASE}/sanpham`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -794,11 +786,11 @@ async function openTab(tabName) {
             };
 
             // Log chi tiết để debug
-            console.log('PUT URL:', `https://btldbs-api.onrender.com/api/sanpham/${id}`);
+            console.log('PUT URL:', `${API_BASE}/sanpham/${id}`);
             console.log('PUT body:', updatedProduct);
 
             try {
-                const response = await fetch(`https://btldbs-api.onrender.com/api/sanpham/${id}`, {
+                const response = await fetch(`${API_BASE}/sanpham/${id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -833,7 +825,7 @@ async function openTab(tabName) {
 
             console.log(`Attempting to delete product with ID: ${productId}`);
             try {
-                const response = await fetch(`https://btldbs-api.onrender.com/api/sanpham/${productId}`, {
+                const response = await fetch(`${API_BASE}/sanpham/${productId}`, {
                     method: 'DELETE'
                 });
 
@@ -874,7 +866,7 @@ async function openTab(tabName) {
          */
         async function fetchProducts() {
             try {
-                const response = await fetch('https://btldbs-api.onrender.com/api/sanpham');
+                const response = await fetch(`${API_BASE}/sanpham`);
         const products = await response.json();
                 const productList = document.getElementById('product-list');
         productList.innerHTML = '';
@@ -923,7 +915,7 @@ async function openTab(tabName) {
             console.log('Attempting to add new customer:', newCustomer);
 
             try {
-                const response = await fetch('https://btldbs-api.onrender.com/api/khachhang', { // Assuming API endpoint for customers
+                const response = await fetch(`${API_BASE}/khachhang`, { // Assuming API endpoint for customers
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -970,7 +962,7 @@ async function openTab(tabName) {
             console.log('Attempting to update customer:', updatedCustomer);
 
             try {
-                const response = await fetch(`https://btldbs-api.onrender.com/api/khachhang/${currentEditingCustomerId}`, { // Assuming API endpoint for customers
+                const response = await fetch(`${API_BASE}/khachhang/${currentEditingCustomerId}`, { // Assuming API endpoint for customers
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1005,7 +997,7 @@ async function openTab(tabName) {
 
             console.log(`Attempting to delete customer with ID: ${customerId}`);
             try {
-                const response = await fetch(`https://btldbs-api.onrender.com/api/khachhang/${customerId}`, { // Assuming API endpoint for customers
+                const response = await fetch(`${API_BASE}/khachhang/${customerId}`, { // Assuming API endpoint for customers
                     method: 'DELETE'
                 });
 
@@ -1044,7 +1036,7 @@ async function openTab(tabName) {
         async function fetchCustomers() {
             console.log('Fetching all customers from API...');
             try {
-                const response = await fetch('https://btldbs-api.onrender.com/api/khachhang'); // Assuming API endpoint for customers
+                const response = await fetch(`${API_BASE}/khachhang`); // Assuming API endpoint for customers
                 if (!response.ok) {
                     throw new Error('Lỗi mạng hoặc không tìm thấy tài nguyên');
                 }
@@ -1099,7 +1091,7 @@ async function openTab(tabName) {
             console.log('Attempting to add new supplier:', newSupplier);
 
             try {
-                const response = await fetch('https://btldbs-api.onrender.com/api/nhacungcap', { // Assuming API endpoint for suppliers
+                const response = await fetch(`${API_BASE}/nhacungcap`, { // Assuming API endpoint for suppliers
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1148,7 +1140,7 @@ async function openTab(tabName) {
             console.log('Attempting to update supplier:', updatedSupplier);
 
             try {
-                const response = await fetch(`https://btldbs-api.onrender.com/api/nhacungcap/${currentEditingSupplierId}`, { // Assuming API endpoint for suppliers
+                const response = await fetch(`${API_BASE}/nhacungcap/${currentEditingSupplierId}`, { // Assuming API endpoint for suppliers
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1183,7 +1175,7 @@ async function openTab(tabName) {
 
             console.log(`Attempting to delete supplier with ID: ${supplierId}`);
             try {
-                const response = await fetch(`https://btldbs-api.onrender.com/api/nhacungcap/${supplierId}`, { // Assuming API endpoint for suppliers
+                const response = await fetch(`${API_BASE}/nhacungcap/${supplierId}`, { // Assuming API endpoint for suppliers
                     method: 'DELETE'
                 });
 
@@ -1223,7 +1215,7 @@ async function openTab(tabName) {
         async function fetchSuppliers() {
             console.log('Fetching all suppliers from API...');
             try {
-                const response = await fetch('https://btldbs-api.onrender.com/api/nhacungcap'); // Assuming API endpoint for suppliers
+                const response = await fetch(`${API_BASE}/nhacungcap`); // Assuming API endpoint for suppliers
                 if (!response.ok) {
                     throw new Error('Lỗi mạng hoặc không tìm thấy tài nguyên');
                 }
@@ -1262,7 +1254,7 @@ async function openTab(tabName) {
 async function populateInvoiceDropdowns() {
     // Lấy danh sách khách hàng
     try {
-        const res = await fetch('https://btldbs-api.onrender.com/api/khachhang');
+        const res = await fetch(`${API_BASE}/khachhang`);
         invoiceCustomersCache = await res.json();
     } catch {
         invoiceCustomersCache = [];
@@ -1272,7 +1264,7 @@ async function populateInvoiceDropdowns() {
     const employeeSelect = document.getElementById('invoice-employee-id');
     employeeSelect.innerHTML = '<option value="">-- Chọn nhân viên --</option>';
     try {
-        const res = await fetch('https://btldbs-api.onrender.com/api/nhanvien');
+        const res = await fetch(`${API_BASE}/nhanvien`);
         const employees = await res.json();
         employees.forEach(e => {
             const option = document.createElement('option');
@@ -1285,7 +1277,7 @@ async function populateInvoiceDropdowns() {
 
 async function populateProductDropdown() {
     try {
-        const response = await fetch('https://btldbs-api.onrender.com/api/sanpham');
+        const response = await fetch(`${API_BASE}/sanpham`);
         productsCache = await response.json();
 
         const productSelect = document.querySelector('.product-select');
@@ -1402,7 +1394,7 @@ async function saveInvoice() {
 
     try {
         // Save HoaDon
-        const hoadonResponse = await fetch('https://btldbs-api.onrender.com/api/hoadon', {
+        const hoadonResponse = await fetch(`${API_BASE}/hoadon`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -1427,7 +1419,7 @@ async function saveInvoice() {
             const donGia = parseFloat(row.cells[3].textContent.replace(/[^0-9.-]/g, ''));
 
             // 1. Lưu chi tiết hóa đơn
-            const chiTietResponse = await fetch('https://btldbs-api.onrender.com/api/chitiethoadon', {
+            const chiTietResponse = await fetch(`${API_BASE}/chitiethoadon`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1447,7 +1439,7 @@ async function saveInvoice() {
             // 2. Lấy sản phẩm hiện tại từ API
             let product = null;
             try {
-                const prodRes = await fetch(`https://btldbs-api.onrender.com/api/sanpham/${maSanPham}`);
+                const prodRes = await fetch(`${API_BASE}/sanpham/${maSanPham}`);
                 if (prodRes.ok) product = await prodRes.json();
             } catch {}
             if (product) {
@@ -1467,7 +1459,7 @@ async function saveInvoice() {
                     console.log(`updatedProduct[${key}] =`, updatedProduct[key], '| typeof:', typeof updatedProduct[key]);
                 });
                 console.log('PUT cập nhật sản phẩm:', updatedProduct);
-                await fetch(`https://btldbs-api.onrender.com/api/sanpham/${product.MaSanPham}`, {
+                await fetch(`${API_BASE}/sanpham/${product.MaSanPham}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1503,7 +1495,7 @@ async function resetInvoiceForm() {
 
 async function generateNextInvoiceId() {
     try {
-        const res = await fetch('https://btldbs-api.onrender.com/api/hoadon');
+        const res = await fetch(`${API_BASE}/hoadon`);
         const invoices = await res.json();
         let maxId = 0;
         invoices.forEach(inv => {
@@ -1550,7 +1542,7 @@ async function generateNextInvoiceId() {
 async function deleteInvoice(maDon) {
     if (!confirm(`Bạn có chắc chắn muốn xóa hóa đơn có mã ${String(maDon).padStart(6, '0')}?`)) return;
     try {
-        const response = await fetch(`https://btldbs-api.onrender.com/api/hoadon/${maDon}`, {
+        const response = await fetch(`${API_BASE}/hoadon/${maDon}`, {
             method: 'DELETE'
         });
         if (!response.ok) {
@@ -1571,7 +1563,7 @@ async function deleteInvoice(maDon) {
 }
 async function fetchInvoices() {
     try {
-        const res = await fetch('https://btldbs-api.onrender.com/api/hoadon');
+        const res = await fetch(`${API_BASE}/hoadon`);
         let data = await res.json();
         // Sắp xếp theo MaDon giảm dần (mới nhất trước)
         data.sort((a, b) => Number(b.MaDon) - Number(a.MaDon));
@@ -1606,7 +1598,7 @@ async function showInvoiceDetail(maDon) {
     const contentDiv = document.getElementById('invoice-detail-content');
     contentDiv.innerHTML = '<div style="text-align:center; color:#1976d2;">Đang tải chi tiết...</div>';
     try {
-        const res = await fetch(`https://btldbs-api.onrender.com/api/chitiethoadon?madon=${maDon}`);
+        const res = await fetch(`${API_BASE}/chitiethoadon?madon=${maDon}`);
         if (!res.ok) throw new Error('Failed to fetch invoice details');
         let details = await res.json();
         details = details.filter(item => item.MaDon == maDon);
@@ -1643,7 +1635,7 @@ async function populateImportDropdowns() {
     const supplierSelect = document.getElementById('import-supplier-id');
     supplierSelect.innerHTML = '<option value="">-- Chọn nhà cung cấp --</option>';
     try {
-        const res = await fetch('https://btldbs-api.onrender.com/api/nhacungcap');
+        const res = await fetch(`${API_BASE}/nhacungcap`);
         const suppliers = await res.json();
         suppliers.forEach(sup => {
             const option = document.createElement('option');
@@ -1656,7 +1648,7 @@ async function populateImportDropdowns() {
     const employeeSelect = document.getElementById('import-employee-id');
     employeeSelect.innerHTML = '<option value="">-- Chọn nhân viên --</option>';
     try {
-        const res = await fetch('https://btldbs-api.onrender.com/api/nhanvien');
+        const res = await fetch(`${API_BASE}/nhanvien`);
         const employees = await res.json();
         employees.forEach(e => {
             const option = document.createElement('option');
@@ -1670,7 +1662,7 @@ async function populateImportDropdowns() {
     productSelect.innerHTML = '<option value="">-- Chọn sản phẩm --</option>';
     let products = [];
     try {
-        const res = await fetch('https://btldbs-api.onrender.com/api/sanpham');
+        const res = await fetch(`${API_BASE}/sanpham`);
         products = await res.json();
         products.forEach(p => {
             const option = document.createElement('option');
@@ -1720,7 +1712,7 @@ async function populateImportDropdowns() {
 
 async function generateNextImportId() {
     try {
-        const res = await fetch('https://btldbs-api.onrender.com/api/donnhaphang');
+        const res = await fetch(`${API_BASE}/donnhaphang`);
         const orders = await res.json();
         let maxId = 0;
         orders.forEach(o => {
@@ -1761,7 +1753,7 @@ async function addChiTietNhapHangItem() {
         // Tạo sản phẩm mới qua API, set SoLuong = quantity
         let newId = 1;
         try {
-            const res = await fetch('https://btldbs-api.onrender.com/api/sanpham');
+            const res = await fetch(`${API_BASE}/sanpham`);
             const products = await res.json();
             if (products.length > 0) {
                 newId = Math.max(...products.map(p => p.MaSanPham)) + 1;
@@ -1776,7 +1768,7 @@ async function addChiTietNhapHangItem() {
             GiaTienBan: parseFloat(giaBan)
         };
         try {
-            const res = await fetch('https://btldbs-api.onrender.com/api/sanpham', {
+            const res = await fetch(`${API_BASE}/sanpham`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newProduct)
@@ -1793,7 +1785,7 @@ async function addChiTietNhapHangItem() {
         maSanPham = parseInt(productId);
         // Lấy tên sản phẩm
         try {
-            const res = await fetch('https://btldbs-api.onrender.com/api/sanpham');
+            const res = await fetch(`${API_BASE}/sanpham`);
             const products = await res.json();
             const prod = products.find(p => p.MaSanPham === maSanPham);
             if (prod) {
@@ -1867,7 +1859,7 @@ async function saveImportOrder() {
     }
     try {
         // Lưu DonNhapHang
-        const donNhapResponse = await fetch('https://btldbs-api.onrender.com/api/donnhaphang', {
+        const donNhapResponse = await fetch(`${API_BASE}/donnhaphang`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1885,7 +1877,7 @@ async function saveImportOrder() {
             const soLuong = parseInt(row.cells[2].textContent);
             const donGia = parseFloat(row.cells[3].textContent.replace(/[^0-9.-]/g, ''));
             // 1. Lưu chi tiết nhập hàng
-            const chiTietResponse = await fetch('https://btldbs-api.onrender.com/api/chitietnhaphang', {
+            const chiTietResponse = await fetch(`${API_BASE}/chitietnhaphang`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -1899,7 +1891,7 @@ async function saveImportOrder() {
             // 2. Lấy sản phẩm hiện tại
             let product = null;
             try {
-                const prodRes = await fetch(`https://btldbs-api.onrender.com/api/sanpham/${maSanPham}`);
+                const prodRes = await fetch(`${API_BASE}/sanpham/${maSanPham}`);
                 if (prodRes.ok) product = await prodRes.json();
             } catch {}
             // Nếu là sản phẩm mới (isNewProduct), không cộng thêm số lượng nữa
@@ -1922,7 +1914,7 @@ async function saveImportOrder() {
                     console.log(`updatedProduct[${key}] =`, updatedProduct[key], '| typeof:', typeof updatedProduct[key]);
                 });
                 console.log('PUT cập nhật sản phẩm:', updatedProduct);
-                await fetch(`https://btldbs-api.onrender.com/api/sanpham/${product.MaSanPham}`, {
+                await fetch(`${API_BASE}/sanpham/${product.MaSanPham}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1943,7 +1935,7 @@ async function saveImportOrder() {
 
 async function fetchImportOrders() {
     try {
-        const res = await fetch('https://btldbs-api.onrender.com/api/donnhaphang');
+        const res = await fetch(`${API_BASE}/donnhaphang`);
         const data = await res.json();
         // Sắp xếp theo MaDon giảm dần (mới nhất trước)
         data.sort((a, b) => Number(b.MaDon) - Number(a.MaDon));
@@ -1976,7 +1968,7 @@ async function fetchImportOrders() {
 async function deleteImportOrder(maDon) {
     if (!confirm(`Bạn có chắc chắn muốn xóa phiếu nhập có mã ${String(maDon).padStart(6, '0')}?`)) return;
     try {
-        const response = await fetch(`https://btldbs-api.onrender.com/api/donnhaphang/${maDon}`, {
+        const response = await fetch(`${API_BASE}/donnhaphang/${maDon}`, {
             method: 'DELETE'
         });
         if (!response.ok) {
@@ -2005,12 +1997,12 @@ function closeImportDetailModal() {
 async function showImportOrderDetail(maDon) {
     try {
         // Lấy toàn bộ chi tiết nhập hàng
-        const response = await fetch('https://btldbs-api.onrender.com/api/chitietnhaphang');
+        const response = await fetch(`${API_BASE}/chitietnhaphang`);
         const chiTietList = await response.json();
         const chiTietDonNhap = chiTietList.filter(item => item.MaDon === maDon);
 
         // Lấy toàn bộ sản phẩm
-        const spRes = await fetch('https://btldbs-api.onrender.com/api/sanpham');
+        const spRes = await fetch(`${API_BASE}/sanpham`);
         const spList = await spRes.json();
 
         let content = `
