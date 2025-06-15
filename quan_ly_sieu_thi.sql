@@ -9,9 +9,7 @@ CREATE TABLE NhanVien (
     Ten VARCHAR(100) NOT NULL,
     ChucVu VARCHAR(50),
     NgayThangNamSinh DATE,
-    DiaChi VARCHAR(255),
-    Luong DECIMAL(15,2) CHECK (Luong >= 0),
-    Tuoi INT CHECK (Tuoi >= 18)
+    DiaChi VARCHAR(255)
 );
 
 CREATE TABLE NhaCungCap (
@@ -19,6 +17,15 @@ CREATE TABLE NhaCungCap (
     TenCongTy VARCHAR(100) NOT NULL,
     SoDienThoai VARCHAR(20) UNIQUE NOT NULL,
     Email VARCHAR(100) UNIQUE
+);
+
+CREATE TABLE SanPham (
+    MaSanPham INT PRIMARY KEY,
+    TenSanPham VARCHAR(100) NOT NULL,
+    DonViTinh VARCHAR(50),
+    SoLuong INT CHECK (SoLuong >= 0) DEFAULT 0,
+    GiaTienBan DECIMAL(15,2) CHECK (GiaTienBan >= 0) NOT NULL DEFAULT 0,
+    GiaTienNhap DECIMAL(15,2) CHECK (GiaTienNhap >= 0) NOT NULL DEFAULT 0
 );
 
 CREATE TABLE HoaDon (
@@ -45,15 +52,6 @@ CREATE TABLE DonNhapHang (
         REFERENCES NhaCungCap(IdNhaCungCap) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-CREATE TABLE SanPham (
-    MaSanPham INT PRIMARY KEY,
-    TenSanPham VARCHAR(100),
-    DonViTinh VARCHAR(50),
-    SoLuong INT CHECK (SoLuong >= 0),
-    GiaTienBan DECIMAL(15,2) CHECK (GiaTienBan >= 0),
-    GiaTienNhap DECIMAL(15,2) CHECK (GiaTienNhap >= 0)
-);
-
 CREATE TABLE ChiTietHoaDon (
     MaDon INT,
     MaSanPham INT,
@@ -77,16 +75,3 @@ CREATE TABLE ChiTietNhapHang (
     CONSTRAINT fk_chitietnhaphang_sanpham FOREIGN KEY (MaSanPham)
         REFERENCES SanPham(MaSanPham) ON UPDATE CASCADE ON DELETE CASCADE
 );
-
--- Nâng cấp bảng SanPham cho database đang chạy
-ALTER TABLE SanPham
-    DROP COLUMN NgaySanXuat,
-    DROP COLUMN HanSuDung;
-
-ALTER TABLE SanPham
-    CHANGE GiaTien GiaTienBan DECIMAL(15,2) NOT NULL DEFAULT 0;
-
-ALTER TABLE SanPham
-    ADD COLUMN GiaTienNhap DECIMAL(15,2) NOT NULL DEFAULT 0;
-
-UPDATE SanPham SET GiaTienNhap = GiaTienBan;
