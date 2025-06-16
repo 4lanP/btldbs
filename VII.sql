@@ -56,23 +56,19 @@ JOIN
     ChiTietHoaDon cthd ON hd.MaDon = cthd.MaDon
 JOIN
     SanPham sp ON cthd.MaSanPham = sp.MaSanPham;
--- 2. Tổng số lượng sản phẩm đã bán của mỗi loại sản phẩm theo tháng (sử dụng GROUP BY và HAVING)
+-- 2.
 SELECT
-    sp.TenSanPham,
-    strftime('%Y-%m', hd.Ngay) AS Thang, -- strftime cho SQLite, dùng FORMAT(hd.Ngay, 'yyyy-MM') cho SQL Server hoặc TO_CHAR(hd.Ngay, 'YYYY-MM') cho PostgreSQL/Oracle
-    SUM(cthd.SoLuong) AS TongSoLuongBan
-FROM
-    SanPham sp
-JOIN
-    ChiTietHoaDon cthd ON sp.MaSanPham = cthd.MaSanPham
-JOIN
-    HoaDon hd ON cthd.MaDon = hd.MaDon
-GROUP BY
-    sp.TenSanPham, Thang
-HAVING
-    SUM(cthd.SoLuong) > 5 -- Chỉ hiển thị sản phẩm bán được hơn 5 chiếc trong tháng đó
-ORDER BY
-    Thang, TongSoLuongBan DESC;
+    kh.HoTen       AS KhachHang,
+    hd.MaDon       AS SoHoaDon,
+    ct.SoLuong     AS SoLuongMua,
+    ct.DonGia      AS DonGiaBan,
+    (ct.SoLuong * ct.DonGia) AS ThanhTien
+FROM KhachHang kh
+JOIN HoaDon hd
+    ON kh.IdKhachHang = hd.IdKhachHang
+JOIN ChiTietHoaDon ct
+    ON hd.MaDon = ct.MaDon
+ORDER BY hd.MaDon;
 
 -- 3. Doanh thu của từng nhân viên theo từng sản phẩm đã bán, chỉ hiển thị những cặp nhân viên-sản phẩm có tổng doanh thu trên 10,000,000
 SELECT
