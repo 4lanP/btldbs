@@ -9,7 +9,8 @@ CREATE TABLE NhanVien (
     Ten VARCHAR(100) NOT NULL,
     ChucVu VARCHAR(50),
     NgayThangNamSinh DATE,
-    DiaChi VARCHAR(255)
+    DiaChi VARCHAR(255),
+    Luong DECIMAL(15,2) CHECK (Luong >= 0) NOT NULL DEFAULT 0
 );
 
 CREATE TABLE NhaCungCap (
