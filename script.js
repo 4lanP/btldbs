@@ -2128,3 +2128,81 @@ async function initializeStatistics() {
     // Load initial statistics
     await updateStatistics();
 }
+// --- Modal cho logic thêm khách hàng mới khi không tìm thấy SĐT ---
+function showAddCustomerModal(phone) {
+    let modal = document.getElementById('add-customer-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'add-customer-modal';
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width:400px;">
+                <span class="close" onclick="closeAddCustomerModal()">&times;</span>
+                <h3>Khách hàng không tồn tại</h3>
+                <p>Bạn có muốn thêm khách hàng mới với số điện thoại <b id="modal-customer-phone"></b> không?</p>
+                <div style="text-align:right;">
+                    <button id="btn-cancel-add-customer">Không</button>
+                    <button id="btn-confirm-add-customer">Có</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    document.getElementById('modal-customer-phone').textContent = phone;
+    modal.style.display = 'block';
+
+    // Gán sự kiện cho nút
+    document.getElementById('btn-cancel-add-customer').onclick = closeAddCustomerModal;
+    document.getElementById('btn-confirm-add-customer').onclick = function() {
+        addCustomerFromInvoice(phone);
+    };
+}
+function closeAddCustomerModal() {
+    const modal = document.getElementById('add-customer-modal');
+    if (modal) modal.style.display = 'none';
+}
+function addCustomerFromInvoice(phone) {
+    closeAddCustomerModal();
+    openTab('khachhang');
+    setTimeout(async () => {
+        await toggleCustomerForm('add');
+        const phoneInput = document.getElementById('new-customer-phone');
+        if (phoneInput) {
+            phoneInput.value = phone;
+            phoneInput.dispatchEvent(new Event('input')); // Nếu có validate
+        }
+        const nameInput = document.getElementById('new-customer-name');
+        if (nameInput) nameInput.focus();
+    }, 300);
+}
+
+// --- Sửa sự kiện nhập SĐT khách hàng ở tab hóa đơn ---
+document.addEventListener('DOMContentLoaded', () => {
+    const phoneInput = document.getElementById('invoice-customer-phone');
+    const infoDiv = document.getElementById('customer-info');
+    if (phoneInput && infoDiv) {
+        phoneInput.addEventListener('input', function () {
+            const value = this.value.trim();
+            // Chỉ xử lý khi đủ 10 số
+            if (!/^\d{10}$/.test(value)) {
+                infoDiv.innerHTML = '';
+                infoDiv.dataset.id = '';
+                return;
+            }
+            const found = invoiceCustomersCache.find(c => c.SoDienThoai === value);
+            if (found) {
+                infoDiv.innerHTML = `
+                    <b>Thông tin khách hàng:</b><br>
+                    ID: ${String(found.IdKhachHang).padStart(6, '0')}<br>
+                    Họ tên: ${found.HoTen}<br>
+                    SĐT: ${found.SoDienThoai}
+                `;
+                infoDiv.dataset.id = found.IdKhachHang;
+            } else {
+                infoDiv.innerHTML = '<span style="color:#d32f2f;">Không tìm thấy khách hàng</span>';
+                infoDiv.dataset.id = '';
+                showAddCustomerModal(value);
+            }
+        });
+    }
+});
