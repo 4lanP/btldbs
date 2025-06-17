@@ -8,330 +8,489 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="sidebar">
-        <button onclick="openTab('khachhang')"><i class="fas fa-user"></i> Khách Hàng</button>
-        <button onclick="openTab('nhanvien')"><i class="fas fa-users"></i> Nhân viên</button>
-        <button onclick="openTab('sanpham')"><i class="fas fa-box"></i> Sản phẩm</button>
-        <button onclick="openTab('nhacungcap')"><i class="fas fa-truck"></i> Nhà cung cấp</button>
-        <button onclick="openTab('hoadon')"><i class="fas fa-file-invoice"></i> Hóa đơn</button>
-    </div>
-    <div class="content">
-        <div id="khachhang" class="tab-content">
-            <div class="container">
-                <h2>Danh sách Khách Hàng</h2>
-                <table id="customer-table">
-                    <thead>
-                        <tr>
-                            <th>ID Khách Hàng</th>
-                            <th>Họ và tên</th>
-                            <th>Số điện thoại</th>
-                            <th>Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody id="customer-list">
-                    </tbody>
-                </table>
-                <button class="add-button" onclick="toggleCustomerForm('add')">Thêm khách hàng</button>
-
-                <form id="add-customer-form" class="data-form">
-                    <h3>Thêm Khách hàng Mới</h3>
-                    <label for="new-customer-id">ID Khách Hàng:</label>
-                    <input type="text" id="new-customer-id" readonly><br><br>
-                    <label for="new-customer-name">Họ và tên:</label>
-                    <input type="text" id="new-customer-name"><br><br>
-
-                    <label for="new-customer-phone">Số điện thoại:</label>
-                    <input type="text" id="new-customer-phone"><br><br>
-
-                    <button type="button" onclick="addCustomer()">Lưu khách hàng</button>
-                </form>
-
-                <form id="edit-customer-form" class="data-form">
-                    <h3>Sửa Thông tin Khách hàng</h3>
-                    <label for="edit-customer-id">ID Khách Hàng:</label>
-                    <input type="text" id="edit-customer-id" readonly><br><br>
-
-                    <label for="edit-customer-name">Họ và tên:</label>
-                    <input type="text" id="edit-customer-name"><br><br>
-
-                    <label for="edit-customer-phone">Số điện thoại:</label>
-                    <input type="text" id="edit-customer-phone"><br><br>
-
-                    <button type="button" onclick="updateCustomer()">Cập nhật khách hàng</button>
-                </form>
-            </div>
+    <header class="main-header">
+        <div class="header-content">
+            <img src="img/IMG_3217.jpg" alt="Supermarket Logo" class="logo">
+            <h1>Hệ Thống Quản Lý Siêu Thị</h1>
         </div>
-        <div id="nhanvien" class="tab-content active">
-            <div class="container">
-                <h2>Danh sách Nhân viên</h2>
-                <table id="employee-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Họ và tên</th>
-                            <th>Chức vụ</th>
-                            <th>Ngày tháng năm sinh</th>
-                            <th>Địa chỉ</th>
-                            <th>Lương</th>
-                            <th>Tuổi</th>
-                            <th>Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody id="employee-list">
-                    </tbody>
-                </table>
-                <button class="add-button" onclick="toggleEmployeeForm('add')">Thêm nhân viên</button>
-
-                <form id="add-employee-form" class="data-form">
-                    <h3>Thêm Nhân viên Mới</h3>
-                    <label for="new-employee-id">ID:</label>
-                    <input type="text" id="new-employee-id" readonly><br><br>
-                    <label for="new-employee-name">Họ và tên:</label>
-                    <input type="text" id="new-employee-name"><br><br>
-
-                    <label for="new-employee-position">Chức vụ:</label>
-                    <input type="text" id="new-employee-position"><br><br>
-
-                    <label for="new-employee-dob">Ngày tháng năm sinh:</label>
-                    <input type="date" id="new-employee-dob"><br><br>
-
-                    <label for="new-employee-address">Địa chỉ:</label>
-                    <input type="text" id="new-employee-address"><br><br>
-
-                    <label for="new-employee-salary">Lương:</label>
-                    <input type="number" id="new-employee-salary"><br><br>
-
-                    <button type="button" onclick="addEmployee()">Lưu nhân viên</button>
-                </form>
-
-                <form id="edit-employee-form" class="data-form">
-                    <h3>Sửa Thông tin Nhân viên</h3>
-                    <label for="edit-employee-id">ID:</label>
-                    <input type="text" id="edit-employee-id" readonly><br><br>
-
-                    <label for="edit-employee-name">Họ và tên:</label>
-                    <input type="text" id="edit-employee-name"><br><br>
-
-                    <label for="edit-employee-position">Chức vụ:</label>
-                    <input type="text" id="edit-employee-position"><br><br>
-
-                    <label for="edit-employee-dob">Ngày tháng năm sinh:</label>
-                    <input type="date" id="edit-employee-dob"><br><br>
-
-                    <label for="edit-employee-address">Địa chỉ:</label>
-                    <input type="text" id="edit-employee-address"><br><br>
-
-                    <label for="edit-employee-salary">Lương:</label>
-                    <input type="number" id="edit-employee-salary"><br><br>
-
-                    <button type="button" onclick="updateEmployee()">Cập nhật nhân viên</button>
-                </form>
-            </div>
+    </header>
+    <div class="main-layout">
+        <div class="sidebar">
+            <button onclick="openTab('khachhang')"><i class="fas fa-user"></i> Khách Hàng</button>
+            <button onclick="openTab('nhanvien')"><i class="fas fa-users"></i> Nhân viên</button>
+            <button onclick="openTab('sanpham')"><i class="fas fa-box"></i> Sản phẩm</button>
+            <button onclick="openTab('nhacungcap')"><i class="fas fa-truck"></i> Nhà cung cấp</button>
+            <button onclick="openTab('hoadon')"><i class="fas fa-file-invoice"></i> Hóa đơn</button>
+            <button onclick="openTab('nhaphang')"><i class="fas fa-cart-plus"></i> Nhập hàng</button>
+            <button onclick="openTab('thongke')"><i class="fas fa-chart-bar"></i> Thống kê</button>
         </div>
+        <div class="content">
+            <div id="khachhang" class="tab-content">
+                <div class="container">
+                    <h2>Danh sách Khách Hàng</h2>
+                    <div class="table-header">
+                    <button class="add-button" onclick="toggleCustomerForm('add')">Thêm khách hàng</button>
+                    </div>
+                    <table id="customer-table">
+                        <thead>
+                            <tr>
+                                <th>ID Khách Hàng</th>
+                                <th>Họ và tên</th>
+                                <th>Số điện thoại</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customer-list">
+                        </tbody>
+                    </table>
 
-        <div id="sanpham" class="tab-content">
-            <div class="container">
-                <h2>Danh sách Sản phẩm</h2>
-                <table id="product-table">
-                    <thead>
-                        <tr>
-                            <th>Mã sản phẩm</th>
-                            <th>Tên sản phẩm</th>
-                            <th>Đơn vị tính</th>
-                            <th>Số lượng</th>
-                            <th>Ngày sản xuất</th>
-                            <th>Hạn sử dụng</th>
-                            <th>Giá tiền</th>
-                            <th>Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody id="product-list">
-                    </tbody>
-                </table>
-                <button class="add-button" onclick="toggleProductForm('add')">Thêm sản phẩm</button>
+                    <form id="add-customer-form" class="data-form">
+                        <h3>Thêm Khách hàng Mới</h3>
+                        <label for="new-customer-id">ID Khách Hàng:</label>
+                        <input type="text" id="new-customer-id" readonly><br><br>
+                        <label for="new-customer-name">Họ và tên:</label>
+                        <input type="text" id="new-customer-name"><br><br>
 
-                <form id="add-product-form" class="data-form">
-                    <h3>Thêm Sản phẩm Mới</h3>
-                    <label for="new-product-id">Mã sản phẩm:</label>
-                    <input type="text" id="new-product-id" readonly><br><br>
-                    <label for="new-product-name">Tên sản phẩm:</label>
-                    <input type="text" id="new-product-name"><br><br>
+                        <label for="new-customer-phone">Số điện thoại:</label>
+                        <input type="text" id="new-customer-phone"><br><br>
 
-                    <label for="new-product-unit">Đơn vị tính:</label>
-                    <input type="text" id="new-product-unit"><br><br>
+                        <button type="button" onclick="addCustomer()">Lưu khách hàng</button>
+                    </form>
 
-                    <label for="new-product-quantity">Số lượng:</label>
-                    <input type="number" id="new-product-quantity"><br><br>
+                    <form id="edit-customer-form" class="data-form">
+                        <h3>Sửa Thông tin Khách hàng</h3>
+                        <label for="edit-customer-id">ID Khách Hàng:</label>
+                        <input type="text" id="edit-customer-id" readonly><br><br>
 
-                    <label for="new-product-mfg-date">Ngày sản xuất:</label>
-                    <input type="date" id="new-product-mfg-date"><br><br>
+                        <label for="edit-customer-name">Họ và tên:</label>
+                        <input type="text" id="edit-customer-name"><br><br>
 
-                    <label for="new-product-exp-date">Hạn sử dụng:</label>
-                    <input type="date" id="new-product-exp-date"><br><br>
+                        <label for="edit-customer-phone">Số điện thoại:</label>
+                        <input type="text" id="edit-customer-phone"><br><br>
 
-                    <label for="new-product-price">Giá tiền:</label>
-                    <input type="number" id="new-product-price"><br><br>
-
-                    <button type="button" onclick="addProduct()">Lưu sản phẩm</button>
-                </form>
-
-                <form id="edit-product-form" class="data-form">
-                    <h3>Sửa Thông tin Sản phẩm</h3>
-                    <label for="edit-product-id">Mã sản phẩm:</label>
-                    <input type="text" id="edit-product-id" readonly><br><br>
-
-                    <label for="edit-product-name">Tên sản phẩm:</label>
-                    <input type="text" id="edit-product-name"><br><br>
-
-                    <label for="edit-product-unit">Đơn vị tính:</label>
-                    <input type="text" id="edit-product-unit"><br><br>
-
-                    <label for="edit-product-quantity">Số lượng:</label>
-                    <input type="number" id="edit-product-quantity"><br><br>
-
-                    <label for="edit-product-mfg-date">Ngày sản xuất:</label>
-                    <input type="date" id="edit-product-mfg-date"><br><br>
-
-                    <label for="edit-product-exp-date">Hạn sử dụng:</label>
-                    <input type="date" id="edit-product-exp-date"><br><br>
-
-                    <label for="edit-product-price">Giá tiền:</label>
-                    <input type="number" id="edit-product-price"><br><br>
-
-                    <button type="button" onclick="updateProduct()">Cập nhật sản phẩm</button>
-                </form>
+                        <button type="button" onclick="updateCustomer()">Cập nhật khách hàng</button>
+                    </form>
+                </div>
             </div>
-        </div>
+            <!-- Tab Nhân viên -->
+            <div id="nhanvien" class="tab-content active">
+                <div class="container">
+                    <h2>Danh sách Nhân viên</h2>
+                    <div class="table-header">
+                        <button class="add-button" onclick="toggleEmployeeForm('add')">Thêm nhân viên</button>
+                    </div>
+                    <table id="employee-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Họ và tên</th>
+                                <th>Chức vụ</th>
+                                <th>Ngày tháng năm sinh</th>
+                                <th>Địa chỉ</th>
+                                <th>Lương</th>
+                                <th>Tuổi</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employee-list">
+                        </tbody>
+                    </table>
+                    <form id="add-employee-form" class="data-form">
+                        <h3>Thêm Nhân viên Mới</h3>
+                        <label for="new-employee-id">ID:</label>
+                        <input type="text" id="new-employee-id" readonly><br><br>
+                        <label for="new-employee-name">Họ và tên:</label>
+                        <input type="text" id="new-employee-name"><br><br>
 
-        <div id="nhacungcap" class="tab-content">
-            <div class="container">
-                <h2>Danh sách Nhà cung cấp</h2>
-                <table id="supplier-table">
-                    <thead>
-                        <tr>
-                            <th>ID Nhà Cung Cấp</th>
-                            <th>Tên Công Ty</th>
-                            <th>Số điện thoại</th>
-                            <th>Email</th>
-                            <th>Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody id="supplier-list">
-                    </tbody>
-                </table>
-                <button class="add-button" onclick="toggleSupplierForm('add')">Thêm nhà cung cấp</button>
+                        <label for="new-employee-position">Chức vụ:</label>
+                        <input type="text" id="new-employee-position"><br><br>
 
-                <form id="add-supplier-form" class="data-form">
-                    <h3>Thêm Nhà cung cấp Mới</h3>
-                    <label for="new-supplier-id">ID Nhà Cung Cấp:</label>
-                    <input type="text" id="new-supplier-id" readonly><br><br>
-                    <label for="new-supplier-company-name">Tên Công Ty:</label>
-                    <input type="text" id="new-supplier-company-name"><br><br>
+                        <label for="new-employee-dob">Ngày tháng năm sinh:</label>
+                        <input type="date" id="new-employee-dob"><br><br>
 
-                    <label for="new-supplier-phone">Số điện thoại:</label>
-                    <input type="text" id="new-supplier-phone"><br><br>
+                        <label for="new-employee-address">Địa chỉ:</label>
+                        <input type="text" id="new-employee-address"><br><br>
 
-                    <label for="new-supplier-email">Email:</label>
-                    <input type="text" id="new-supplier-email"><br><br>
+                        <label for="new-employee-salary">Lương:</label>
+                        <input type="number" id="new-employee-salary"><br><br>
 
-                    <button type="button" onclick="addSupplier()">Lưu nhà cung cấp</button>
-                </form>
+                        <button type="button" onclick="addEmployee()">Lưu nhân viên</button>
+                    </form>
 
-                <form id="edit-supplier-form" class="data-form">
-                    <h3>Sửa Thông tin Nhà cung cấp</h3>
-                    <label for="edit-supplier-id">ID Nhà Cung Cấp:</label>
-                    <input type="text" id="edit-supplier-id" readonly><br><br>
+                    <form id="edit-employee-form" class="data-form">
+                        <h3>Sửa Thông tin Nhân viên</h3>
+                        <label for="edit-employee-id">ID:</label>
+                        <input type="text" id="edit-employee-id" readonly><br><br>
 
-                    <label for="edit-supplier-company-name">Tên Công Ty:</label>
-                    <input type="text" id="edit-supplier-company-name"><br><br>
+                        <label for="edit-employee-name">Họ và tên:</label>
+                        <input type="text" id="edit-employee-name"><br><br>
 
-                    <label for="edit-supplier-phone">Số điện thoại:</label>
-                    <input type="text" id="edit-supplier-phone"><br><br>
+                        <label for="edit-employee-position">Chức vụ:</label>
+                        <input type="text" id="edit-employee-position"><br><br>
 
-                    <label for="edit-supplier-email">Email:</label>
-                    <input type="text" id="edit-supplier-email"><br><br>
+                        <label for="edit-employee-dob">Ngày tháng năm sinh:</label>
+                        <input type="date" id="edit-employee-dob"><br><br>
 
-                    <button type="button" onclick="updateSupplier()">Cập nhật nhà cung cấp</button>
-                </form>
+                        <label for="edit-employee-address">Địa chỉ:</label>
+                        <input type="text" id="edit-employee-address"><br><br>
+
+                        <label for="edit-employee-salary">Lương:</label>
+                        <input type="number" id="edit-employee-salary"><br><br>
+
+                        <button type="button" onclick="updateEmployee()">Cập nhật nhân viên</button>
+                    </form>
+                </div>
             </div>
-        </div>
 
-        <div id="hoadon" class="tab-content">
-            <div class="container">
-                <h2>Tạo hoá đơn</h2>
-                <label for="invoice-id">Mã hoá đơn:</label>
-                <input type="text" id="invoice-id" readonly style="background:#f0f8ff;">
-                <br><br>
-                <label for="invoice-date">Ngày lập:</label>
-                <input type="date" id="invoice-date">
-                <br><br>
-                <label for="invoice-customer-phone">Nhập SĐT khách hàng:</label>
-                <input type="text" id="invoice-customer-phone" placeholder="Nhập số điện thoại">
-                <div id="customer-info" style="margin-top:16px;"></div>
-                <br>
-                <label for="invoice-employee-id">Chọn nhân viên:</label>
-                <select id="invoice-employee-id">
-                    <option value="">-- Chọn nhân viên --</option>
-                </select>
-                <br>
-                
-                
-                <div id="chitiethoadon-form" style="margin-top: 32px;">
-                    <h3>Chi tiết hóa đơn</h3>
-                    <div id="chitiethoadon-items">
-                        <div class="chitiethoadon-item">
-                            <label for="product-select">Chọn sản phẩm:</label>
-                            <select class="product-select" style="width: 300px;">
-                                <option value="">-- Chọn sản phẩm --</option>
-                            </select>
-                            
-                            <label for="quantity">Số lượng:</label>
-                            <input type="number" class="quantity" min="1" value="1">
-                            
-                            <button type="button" class="add-item" onclick="addChiTietHoaDonItem()">Thêm vào hóa đơn</button>
+            <!-- Tab Sản phẩm -->
+            <div id="sanpham" class="tab-content">
+                <div class="container">
+                    <h2>Danh sách Sản phẩm</h2>
+                    <div class="table-header">
+                        <button class="add-button" onclick="toggleProductForm('add')">Thêm sản phẩm</button>
+                    </div>
+                    <table id="product-table">
+                        <thead>
+                            <tr>
+                                <th>Mã sản phẩm</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Đơn vị tính</th>
+                                <th>Số lượng</th>
+                                <th>Giá tiền nhập</th>
+                                <th>Giá tiền bán</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="product-list">
+                        </tbody>
+                    </table>
+                    <form id="add-product-form" class="data-form">
+                        <h3>Thêm Sản phẩm Mới</h3>
+                        <label for="new-product-id">Mã sản phẩm:</label>
+                        <input type="text" id="new-product-id" readonly><br><br>
+                        <label for="new-product-name">Tên sản phẩm:</label>
+                        <input type="text" id="new-product-name"><br><br>
+
+                        <label for="new-product-unit">Đơn vị tính:</label>
+                        <input type="text" id="new-product-unit"><br><br>
+
+                        <label for="new-product-quantity">Số lượng:</label>
+                        <input type="number" id="new-product-quantity"><br><br>
+
+                        <label for="new-product-purchase-price">Giá tiền nhập:</label>
+                        <input type="number" id="new-product-purchase-price"><br><br>
+
+                        <label for="new-product-sale-price">Giá tiền bán:</label>
+                        <input type="number" id="new-product-sale-price"><br><br>
+
+                        <button type="button" onclick="addProduct()">Lưu sản phẩm</button>
+                    </form>
+
+                    <form id="edit-product-form" class="data-form">
+                        <h3>Sửa Thông tin Sản phẩm</h3>
+                        <label for="edit-product-id">Mã sản phẩm:</label>
+                        <input type="text" id="edit-product-id" readonly><br><br>
+
+                        <label for="edit-product-name">Tên sản phẩm:</label>
+                        <input type="text" id="edit-product-name"><br><br>
+
+                        <label for="edit-product-unit">Đơn vị tính:</label>
+                        <input type="text" id="edit-product-unit"><br><br>
+
+                        <label for="edit-product-quantity">Số lượng:</label>
+                        <input type="number" id="edit-product-quantity"><br><br>
+
+                        <label for="edit-product-purchase-price">Giá tiền nhập:</label>
+                        <input type="number" id="edit-product-purchase-price"><br><br>
+
+                        <label for="edit-product-sale-price">Giá tiền bán:</label>
+                        <input type="number" id="edit-product-sale-price"><br><br>
+
+                        <button type="button" onclick="updateProduct()">Cập nhật sản phẩm</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tab Nhà cung cấp -->
+            <div id="nhacungcap" class="tab-content">
+                <div class="container">
+                    <h2>Danh sách Nhà cung cấp</h2>
+                    <div class="table-header">
+                        <button class="add-button" onclick="toggleSupplierForm('add')">Thêm nhà cung cấp</button>
+                    </div>
+                    <table id="supplier-table">
+                        <thead>
+                            <tr>
+                                <th>ID Nhà Cung Cấp</th>
+                                <th>Tên Công Ty</th>
+                                <th>Số điện thoại</th>
+                                <th>Email</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="supplier-list">
+                        </tbody>
+                    </table>
+                    <form id="add-supplier-form" class="data-form">
+                        <h3>Thêm Nhà cung cấp Mới</h3>
+                        <label for="new-supplier-id">ID Nhà Cung Cấp:</label>
+                        <input type="text" id="new-supplier-id" readonly><br><br>
+                        <label for="new-supplier-company-name">Tên Công Ty:</label>
+                        <input type="text" id="new-supplier-company-name"><br><br>
+
+                        <label for="new-supplier-phone">Số điện thoại:</label>
+                        <input type="text" id="new-supplier-phone"><br><br>
+
+                        <label for="new-supplier-email">Email:</label>
+                        <input type="text" id="new-supplier-email"><br><br>
+
+                        <button type="button" onclick="addSupplier()">Lưu nhà cung cấp</button>
+                    </form>
+
+                    <form id="edit-supplier-form" class="data-form">
+                        <h3>Sửa Thông tin Nhà cung cấp</h3>
+                        <label for="edit-supplier-id">ID Nhà Cung Cấp:</label>
+                        <input type="text" id="edit-supplier-id" readonly><br><br>
+
+                        <label for="edit-supplier-company-name">Tên Công Ty:</label>
+                        <input type="text" id="edit-supplier-company-name"><br><br>
+
+                        <label for="edit-supplier-phone">Số điện thoại:</label>
+                        <input type="text" id="edit-supplier-phone"><br><br>
+
+                        <label for="edit-supplier-email">Email:</label>
+                        <input type="text" id="edit-supplier-email"><br><br>
+
+                        <button type="button" onclick="updateSupplier()">Cập nhật nhà cung cấp</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="hoadon" class="tab-content">
+                <div class="container">
+                    <h2>Tạo hoá đơn</h2>
+                    <label for="invoice-id">Mã hoá đơn:</label>
+                    <input type="text" id="invoice-id" readonly style="background:#f0f8ff;">
+                    <br><br>
+                    <label for="invoice-date">Ngày lập:</label>
+                    <input type="date" id="invoice-date">
+                    <br><br>
+                    <label for="invoice-customer-phone">Nhập SĐT khách hàng:</label>
+                    <input type="text" id="invoice-customer-phone" placeholder="Nhập số điện thoại">
+                    <div id="customer-info" style="margin-top:16px;"></div>
+                    <br>
+                    <label for="invoice-employee-id">Chọn nhân viên:</label>
+                    <select id="invoice-employee-id">
+                        <option value="">-- Chọn nhân viên --</option>
+                    </select>
+                    <br>
+                    
+                    
+                    <div id="chitiethoadon-form" style="margin-top: 32px;">
+                        <h3>Chi tiết hóa đơn</h3>
+                        <div id="chitiethoadon-items">
+                            <div class="chitiethoadon-item">
+                                <label for="product-select">Chọn sản phẩm:</label>
+                                <select class="product-select" style="width: 300px;">
+                                    <option value="">-- Chọn sản phẩm --</option>
+                                </select>
+                                
+                                <label for="quantity">Số lượng:</label>
+                                <input type="number" class="quantity" min="1" value="1">
+                                
+                                <button type="button" class="add-item" onclick="addChiTietHoaDonItem()">Thêm vào hóa đơn</button>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 32px;">
+                            <h4>Danh sách sản phẩm đã thêm:</h4>
+                            <table id="added-items-table" style="width: 100%; margin-top: 16px;">
+                                <thead>
+                                    <tr>
+                                        <th>Mã sản phẩm</th>
+                                        <th>Tên sản phẩm</th>
+                                        <th>Số lượng</th>
+                                        <th>Đơn giá</th>
+                                        <th>Thành tiền</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="added-items-list">
+                                </tbody>
+                            </table>
+                            <div style="margin-top: 16px; text-align: right;">
+                                <label for="total-amount">Tổng tiền:</label>
+                                <input type="number" id="total-amount" readonly style="font-weight: bold;">
+                            </div>
                         </div>
                     </div>
+                    <button class="add-button" id="save" onclick="saveInvoice()">Lưu hóa đơn</button>
+                    <table id="invoice-table" style="margin-top:32px; width:100%;">
+                        <thead>
+                            <tr>
+                                <th>ID Khách hàng</th>
+                                <th>ID Nhân viên</th>
+                                <th>Mã đơn</th>
+                                <th>Ngày</th>
+                                <th>Tổng tiền</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoice-list"></tbody>
+                    </table>
+                </div>
+            </div>
 
-                    <div style="margin-top: 32px;">
-                        <h4>Danh sách sản phẩm đã thêm:</h4>
-                        <table id="added-items-table" style="width: 100%; margin-top: 16px;">
+            <div id="nhaphang" class="tab-content">
+                <div class="container">
+                    <h2>Tạo phiếu nhập hàng</h2>
+                    <label for="import-id">Mã phiếu nhập:</label>
+                    <input type="text" id="import-id" readonly style="background:#f0f8ff;">
+                    <br><br>
+                    <label for="import-date">Ngày nhập:</label>
+                    <input type="date" id="import-date">
+                    <br><br>
+                    <label for="import-supplier-id">Chọn nhà cung cấp:</label>
+                    <select id="import-supplier-id">
+                        <option value="">-- Chọn nhà cung cấp --</option>
+                    </select>
+                    <br><br>
+                    <label for="import-employee-id">Chọn nhân viên:</label>
+                    <select id="import-employee-id">
+                        <option value="">-- Chọn nhân viên --</option>
+                    </select>
+                    <br><br>
+                    <div id="chitietnhaphang-form">
+                        <h3>Chi tiết nhập hàng</h3>
+                        <div>
+                            <label>Chọn sản phẩm:</label>
+                            <select class="import-product-select" style="width: 300px;">
+                                <!-- Options sẽ được JS render, bao gồm option thêm sản phẩm mới -->
+                            </select>
+                            <label>Số lượng:</label>
+                            <input type="number" class="import-quantity" min="1" value="1">
+                            <label class="import-price-label">Đơn giá nhập:</label>
+                            <input type="number" class="import-price" min="0" value="0">
+                        </div>
+                        <div id="new-product-form" style="display:none; margin-top:12px; background:#f9fbfd; border-radius:8px; padding:16px;">
+                            <h4 style="color:#1976d2; margin-top:0;">Thêm sản phẩm mới</h4>
+                            <label for="new-import-product-name">Tên sản phẩm:</label>
+                            <input type="text" id="new-import-product-name"><br>
+                            <label for="new-import-product-unit">Đơn vị tính:</label>
+                            <input type="text" id="new-import-product-unit"><br>
+                            <label for="new-import-product-purchase-price">Giá nhập:</label>
+                            <input type="number" id="new-import-product-purchase-price"><br>
+                            <label for="new-import-product-sale-price">Giá bán:</label>
+                            <input type="number" id="new-import-product-sale-price"><br>
+                        </div>
+                        <button type="button" onclick="addChiTietNhapHangItem()">Thêm vào phiếu nhập</button>
+                        <table id="imported-items-table" style="width: 100%; margin-top: 16px;">
                             <thead>
                                 <tr>
                                     <th>Mã sản phẩm</th>
                                     <th>Tên sản phẩm</th>
                                     <th>Số lượng</th>
-                                    <th>Đơn giá</th>
+                                    <th>Đơn giá nhập</th>
                                     <th>Thành tiền</th>
                                     <th>Thao tác</th>
                                 </tr>
                             </thead>
-                            <tbody id="added-items-list">
-                            </tbody>
+                            <tbody id="imported-items-list"></tbody>
                         </table>
                         <div style="margin-top: 16px; text-align: right;">
-                            <label for="total-amount">Tổng tiền:</label>
-                            <input type="number" id="total-amount" readonly style="font-weight: bold;">
+                            <label for="import-total-amount">Tổng tiền:</label>
+                            <input type="number" id="import-total-amount" readonly style="font-weight: bold;">
                         </div>
                     </div>
+                    <button class="add-button" onclick="saveImportOrder()">Lưu phiếu nhập</button>
+
+                    <table id="import-order-table" style="margin-top:32px; width:100%;">
+                        <thead>
+                            <tr>
+                                <th>ID Nhà cung cấp</th>
+                                <th>ID Nhân viên</th>
+                                <th>Mã đơn</th>
+                                <th>Ngày</th>
+                                <th>Tổng tiền</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="import-order-list">
+                        </tbody>
+                    </table>
                 </div>
-                <button class="add-button" onclick="saveInvoice()">Lưu hóa đơn</button>
-                <table id="invoice-table" style="margin-top:32px; width:100%;">
-                    <thead>
-                        <tr>
-                            <th>ID Khách hàng</th>
-                            <th>ID Nhân viên</th>
-                            <th>Mã đơn</th>
-                            <th>Ngày</th>
-                            <th>Tổng tiền</th>
-                            <th>Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody id="invoice-list"></tbody>
-                </table>
+            </div>
+
+            <!-- Tab Thống kê -->
+            <div id="thongke" class="tab-content">
+                <div class="container">
+                    <h2>Thống kê</h2>
+                    <div class="statistics-container">
+                        <div class="stat-card">
+                            <h3>Tổng doanh thu</h3>
+                            <div id="total-revenue" class="stat-value">0 VNĐ</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Tổng chi phí nhập hàng</h3>
+                            <div id="total-import-cost" class="stat-value">0 VNĐ</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Lợi nhuận</h3>
+                            <div id="total-profit" class="stat-value">0 VNĐ</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Tổng số đơn hàng</h3>
+                            <div id="total-orders" class="stat-value">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Số khách hàng</h3>
+                            <div id="total-customers" class="stat-value">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Số nhà cung cấp</h3>
+                            <div id="total-suppliers" class="stat-value">0</div>
+                        </div>
+                    </div>
+
+                    <div class="statistics-filters">
+                        <div class="filter-group">
+                            <label for="stat-start-date">Từ ngày:</label>
+                            <input type="date" id="stat-start-date">
+                        </div>
+                        <div class="filter-group">
+                            <label for="stat-end-date">Đến ngày:</label>
+                            <input type="date" id="stat-end-date">
+                        </div>
+                        <button onclick="updateStatistics()" class="filter-button">Cập nhật thống kê</button>
+                    </div>
+
+                    <div class="statistics-details">
+                        <h3>Top sản phẩm bán chạy</h3>
+                        <table id="top-products-table">
+                            <thead>
+                                <tr>
+                                    <th>Mã sản phẩm</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Đơn vị tính</th>
+                                    <th>Số lượng đã bán</th>
+                                    <th>Đơn giá hiện tại</th>
+                                    <th>Doanh thu</th>
+                                </tr>
+                            </thead>
+                            <tbody id="top-products-list">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
+    <footer class="main-footer">
+        <div class="footer-content">
+            <span>© 2024 Supermarket Management. All rights reserved.</span>
+            <span>Hotline: 1800-1234 | Địa chỉ: 123 Đường Siêu Thị, Hà Nội</span>
+        </div>
+    </footer>
     <script src="script.js"></script>
 
     <!-- Modal for invoice details -->
@@ -340,6 +499,17 @@
             <span class="close" onclick="closeInvoiceDetailModal()">&times;</span>
             <h3>Chi tiết hóa đơn</h3>
             <div id="invoice-detail-content">
+                <!-- Details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for import order details -->
+    <div id="import-detail-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeImportDetailModal()">&times;</span>
+            <h3>Chi tiết đơn nhập hàng</h3>
+            <div id="import-detail-content">
                 <!-- Details will be loaded here -->
             </div>
         </div>
